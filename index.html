@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Under Construction - 100 Hari</title>
+    <hta:application 
+        id="appUnderConstruction"
+        applicationname="Under Construction"
+        border="thin"
+        borderstyle="normal"
+        caption="yes"
+        icon=""
+        maximizebutton="no"
+        minimizebutton="yes"
+        sysmenu="yes"
+        windowstate="normal"
+        scroll="no"
+    />
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 80%;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 5px;
+            color: #f59e0b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 10px;
+            border-radius: 10px;
+            min-width: 70px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .label {
+            font-size: 11px;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #64748b;
+        }
+    </style>
+    <script type="text/javascript">
+        // Atur ukuran jendela HTA saat pertama kali dibuka
+        window.resizeTo(550, 420);
+
+        // Set target 100 hari dari detik script ini diakses
+        var totalSeconds = 100 * 24 * 60 * 60;
+
+        function updateTimer() {
+            if (totalSeconds <= 0) {
+                document.getElementById("timer").innerHTML = "<h2 style='color:#10b981;'>Situs / Software Telah SIAP!</h2>";
+                return;
+            }
+
+            var days = Math.floor(totalSeconds / (24 * 3600));
+            var hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+            var minutes = Math.floor((totalSeconds % 3600) / 60);
+            var seconds = Math.floor(totalSeconds % 60);
+
+            document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+            document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+            document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+            document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+
+            totalSeconds--;
+        }
+
+        // Jalankan timer setiap 1 detik (1000 ms)
+        setInterval(updateTimer, 1000);
+    </script>
+</head>
+<body onload="updateTimer()">
+
+    <div class="container">
+        <h1>🚧 Under Construction 🚧</h1>
+        <p>Kami sedang menyiapkan sesuatu yang hebat. Mohon tunggu!</p>
+
+        <div id="timer" class="countdown">
+            <div class="box">
+                <div id="days" class="number">100</div>
+                <div class="label">Hari</div>
+            </div>
+            <div class="box">
+                <div id="hours" class="number">00</div>
+                <div class="label">Jam</div>
+            </div>
+            <div class="box">
+                <div id="minutes" class="number">00</div>
+                <div class="label">Menit</div>
+            </div>
+            <div class="box">
+                <div id="seconds" class="number">00</div>
+                <div class="label">Detik</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Windows Portable Application &copy; 2026
+        </div>
+    </div>
+
+</body>
+</html>
