@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>Sistem Sirkulasi & Inventaris Alat Kerja</title>
-  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, berita acara digital PDF tajam A4, dan WhatsApp tanpa link." />
+  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, audit log device pengunjung, dan export Excel/CSV corporate." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#064e3b" />
 
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SheetJS (XLSX) untuk Export Excel & CSV Corporate Asli -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- jsPDF & html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -64,7 +66,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-extrabold text-xs tracking-tight text-white uppercase">ToolTrack M-Banking</span>
-            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v2.9</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.1</span>
           </div>
           <p class="text-[10px] text-emerald-200/90 font-medium">Sirkulasi & Inspeksi Alat Kerja</p>
         </div>
@@ -86,6 +88,9 @@
       </button>
       <button onclick="switchTab('tools')" class="tab-btn px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-transparent text-emerald-200/70 hover:text-white flex items-center gap-1.5 transition" data-tab="tools">
         <i class="fa-solid fa-cubes"></i> Katalog Inventaris
+      </button>
+      <button onclick="switchTab('devicelogs')" class="tab-btn px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-transparent text-emerald-200/70 hover:text-white flex items-center gap-1.5 transition" data-tab="devicelogs">
+        <i class="fa-solid fa-mobile-screen-button"></i> Log Perangkat
       </button>
     </nav>
   </header>
@@ -143,10 +148,16 @@
           </select>
         </div>
 
-        <button onclick="exportAllCSV()" class="px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
-          <i class="fa-solid fa-file-excel text-emerald-600"></i>
-          <span>Unduh CSV</span>
-        </button>
+        <div class="flex items-center gap-1.5">
+          <button onclick="exportCorporateExcel()" title="Download Excel Berformat Resmi" class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-xs">
+            <i class="fa-solid fa-file-excel text-emerald-200"></i>
+            <span>Export Excel</span>
+          </button>
+          <button onclick="exportCorporateCSV()" title="Download CSV UTF-8" class="flex-1 sm:flex-none px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-bold flex items-center justify-center gap-1 transition active:scale-95 shadow-2xs">
+            <i class="fa-solid fa-file-csv text-slate-500"></i>
+            <span>CSV</span>
+          </button>
+        </div>
       </div>
 
       <!-- List Cards / Table -->
@@ -323,28 +334,109 @@
         <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
       </div>
     </section>
+
+    <!-- TAB 4: AUDIT LOG PERANGKAT PENGUNJUNG (BARU) -->
+    <section id="tab-devicelogs" class="hidden space-y-3">
+      <!-- Device Metrics Widget -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <div>
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-virus text-emerald-600"></i>
+              Audit Log Perangkat Pengunjung
+            </h2>
+            <p class="text-[10px] text-slate-500">Pencatatan jenis gawai, browser, dan alamat IP pengunjung sistem</p>
+          </div>
+          <button onclick="exportDeviceLogsExcel()" class="py-1 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-2xs">
+            <i class="fa-solid fa-file-excel text-emerald-600"></i>
+            <span>Export Log</span>
+          </button>
+        </div>
+
+        <!-- 3 Mini Stats Log -->
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+            <span class="text-[9px] text-slate-400 font-bold uppercase block">Total Kunjungan</span>
+            <span id="statTotalVisits" class="text-base font-extrabold text-slate-800">0</span>
+          </div>
+          <div class="bg-emerald-50/50 p-2 rounded-xl border border-emerald-200">
+            <span class="text-[9px] text-emerald-700 font-bold uppercase block">Pengunjung HP</span>
+            <span id="statMobileVisits" class="text-base font-extrabold text-emerald-700">0</span>
+          </div>
+          <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-200">
+            <span class="text-[9px] text-blue-700 font-bold uppercase block">Desktop / PC</span>
+            <span id="statDesktopVisits" class="text-base font-extrabold text-blue-700">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed / Table Log Perangkat -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen-button text-emerald-600 text-xs"></i>
+            Aktivitas Akses Terakhir
+          </span>
+          <span id="deviceLogBadge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">0 Log</span>
+        </div>
+
+        <!-- Desktop View Table -->
+        <div class="hidden lg:block overflow-x-auto">
+          <table class="w-full text-left text-[11px] border-collapse">
+            <thead class="bg-slate-50 text-slate-600 uppercase font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Waktu Akses</th>
+                <th class="py-2.5 px-3">Tipe Device</th>
+                <th class="py-2.5 px-3">Sistem Operasi</th>
+                <th class="py-2.5 px-3">Browser</th>
+                <th class="py-2.5 px-3">Resolusi Layar</th>
+                <th class="py-2.5 px-3">Lokasi / IP</th>
+              </tr>
+            </thead>
+            <tbody id="deviceLogTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+          </table>
+        </div>
+
+        <!-- Mobile View Cards -->
+        <div id="deviceLogCardContainer" class="lg:hidden p-2.5 space-y-2"></div>
+
+        <!-- Empty Placeholder Log -->
+        <div id="noDeviceLogPlaceholder" class="hidden py-8 text-center">
+          <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-sm mb-1.5">
+            <i class="fa-solid fa-laptop-code"></i>
+          </div>
+          <p class="font-bold text-slate-600 text-xs">Belum ada riwayat akses perangkat</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ========================================================
        MOBILE FLOATING BOTTOM NAV DOCK
   ======================================================== -->
   <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-2 left-3 right-3 bg-white/90 backdrop-blur-lg border border-slate-200/90 rounded-2xl z-40 shadow-lg px-2 py-1.5">
-    <div class="grid grid-cols-3 items-center text-center">
+    <div class="grid grid-cols-4 items-center text-center">
       <button onclick="switchTab('dashboard')" class="mobile-tab-btn flex flex-col items-center py-1 text-emerald-800 font-bold transition active:scale-95" data-tab="dashboard">
         <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
-        <span class="text-[9px] uppercase tracking-wider">Mutasi</span>
+        <span class="text-[8px] uppercase tracking-wider">Mutasi</span>
       </button>
 
       <button onclick="switchTab('borrow')" class="mobile-tab-btn flex flex-col items-center py-0.5 text-slate-400 hover:text-emerald-700 transition active:scale-95" data-tab="borrow">
-        <div class="w-10 h-10 -mt-5 rounded-2xl bg-gradient-to-tr from-emerald-700 to-teal-600 text-white flex items-center justify-center shadow-md border-2 border-white">
-          <i class="fa-solid fa-plus text-sm"></i>
+        <div class="w-9 h-9 -mt-4 rounded-2xl bg-gradient-to-tr from-emerald-700 to-teal-600 text-white flex items-center justify-center shadow-md border-2 border-white">
+          <i class="fa-solid fa-plus text-xs"></i>
         </div>
-        <span class="text-[9px] uppercase font-bold tracking-wider mt-0.5">Pinjam</span>
+        <span class="text-[8px] uppercase font-bold tracking-wider mt-0.5">Pinjam</span>
       </button>
 
       <button onclick="switchTab('tools')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-400 hover:text-emerald-800 transition active:scale-95" data-tab="tools">
         <i class="fa-solid fa-toolbox text-base mb-0.5"></i>
-        <span class="text-[9px] uppercase tracking-wider">Katalog</span>
+        <span class="text-[8px] uppercase tracking-wider">Katalog</span>
+      </button>
+
+      <button onclick="switchTab('devicelogs')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-400 hover:text-emerald-800 transition active:scale-95" data-tab="devicelogs">
+        <i class="fa-solid fa-mobile-screen-button text-base mb-0.5"></i>
+        <span class="text-[8px] uppercase tracking-wider">Device</span>
       </button>
     </div>
   </nav>
@@ -747,6 +839,7 @@
       { id: "ALT-004", name: "Gerinda Tangan Maktec 4 Inch", category: "Power Tools", condition: "Baik", status: "TERSEDIA" }
     ];
     let loans = [];
+    let visitorLogs = [];
     let currentDetailLoan = null;
 
     // 2. SIGNATURE PAD CLASS
@@ -936,7 +1029,6 @@
       if (type === 'return' && returnSigPad) returnSigPad.clear();
     }
 
-    // Helper Konversi Base64 ke Blob Biner Murni (Stabil di iOS & Android)
     function dataURLtoBlob(dataurl) {
       const arr = dataurl.split(',');
       const mime = arr[0].match(/:(.*?);/)[1];
@@ -949,7 +1041,7 @@
       return new Blob([u8arr], { type: mime });
     }
 
-    // 4. STORAGE SUPABASE UPLOADER (DENGAN PENANGANAN ERROR & FALLBACK ROBUST)
+    // 4. STORAGE SUPABASE UPLOADER
     async function uploadToSupabaseStorage(base64Data, filename) {
       if (!supabaseClient || !base64Data || !base64Data.startsWith('data:image')) {
         return base64Data;
@@ -978,7 +1070,192 @@
       }
     }
 
-    // 5. DATABASE SINKRONISASI
+    // ========================================================
+    // 5. AUTO LOG DEVICE PENGUNJUNG (DEVICE DETECTOR ENGINE)
+    // ========================================================
+    function parseDeviceInfo() {
+      const ua = navigator.userAgent || '';
+      let deviceType = "Desktop / Laptop";
+      let os = "Unknown OS";
+      let browser = "Unknown Browser";
+
+      // Device Type
+      if (/tablet|ipad|playbook|silk/i.test(ua)) {
+        deviceType = "Tablet";
+      } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/i.test(ua)) {
+        deviceType = "Mobile Smartphone";
+      }
+
+      // OS
+      if (/Windows/i.test(ua)) os = "Windows";
+      else if (/Android/i.test(ua)) os = "Android";
+      else if (/iPhone|iPad|iPod/i.test(ua)) os = "Apple iOS";
+      else if (/Macintosh|Mac OS X/i.test(ua)) os = "macOS";
+      else if (/Linux/i.test(ua)) os = "Linux";
+
+      // Browser
+      if (/Chrome/i.test(ua) && !/Edge|Edg|OPR/i.test(ua)) browser = "Google Chrome";
+      else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = "Apple Safari";
+      else if (/Edg/i.test(ua)) browser = "Microsoft Edge";
+      else if (/Firefox/i.test(ua)) browser = "Mozilla Firefox";
+      else if (/OPR|Opera/i.test(ua)) browser = "Opera";
+      else if (/SamsungBrowser/i.test(ua)) browser = "Samsung Internet";
+
+      const screenRes = `${window.screen.width}x${window.screen.height} (${window.innerWidth}x${window.innerHeight} viewport)`;
+
+      return { deviceType, os, browser, screenRes, userAgent: ua };
+    }
+
+    async function recordVisitorDeviceLog() {
+      // Cegah multi-insert jika halaman hanya di-refresh dalam sesi yang sama (30 menit)
+      const lastLogged = sessionStorage.getItem('device_logged_time');
+      const nowTs = Date.now();
+      if (lastLogged && (nowTs - parseInt(lastLogged)) < 30 * 60 * 1000) {
+        return;
+      }
+
+      const info = parseDeviceInfo();
+      const logId = "DEV-" + Date.now().toString().slice(-6);
+
+      let ip = "Checking...";
+      let city = "-";
+      let isp = "-";
+
+      try {
+        // Ambil IP Publik secara aman
+        const res = await fetch("https://api.ipify.org?format=json", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          ip = json.ip;
+        }
+      } catch (err) {
+        ip = "Local/Private";
+      }
+
+      const logRecord = {
+        id: logId,
+        device_type: info.deviceType,
+        os: info.os,
+        browser: info.browser,
+        screen_resolution: info.screenRes,
+        ip_address: ip,
+        city: city,
+        isp: isp,
+        user_agent: info.userAgent,
+        visited_at: new Date().toISOString()
+      };
+
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('visitor_logs').insert([logRecord]);
+        } catch (e) {
+          console.warn("Visitor log insert error:", e);
+        }
+      }
+
+      visitorLogs.unshift(logRecord);
+      sessionStorage.setItem('device_logged_time', nowTs.toString());
+      saveVisitorLogsCache();
+      renderDeviceLogs();
+    }
+
+    function saveVisitorLogsCache() {
+      try {
+        localStorage.setItem('app_visitor_logs_cache', JSON.stringify(visitorLogs.slice(0, 100)));
+      } catch (e) {}
+    }
+
+    function renderDeviceLogs() {
+      document.getElementById('statTotalVisits').textContent = visitorLogs.length;
+      document.getElementById('statMobileVisits').textContent = visitorLogs.filter(v => v.device_type === "Mobile Smartphone").length;
+      document.getElementById('statDesktopVisits').textContent = visitorLogs.filter(v => v.device_type === "Desktop / Laptop").length;
+      document.getElementById('deviceLogBadge').textContent = `${visitorLogs.length} Log`;
+
+      const tbody = document.getElementById('deviceLogTableBody');
+      const cardContainer = document.getElementById('deviceLogCardContainer');
+      const placeholder = document.getElementById('noDeviceLogPlaceholder');
+
+      tbody.innerHTML = '';
+      cardContainer.innerHTML = '';
+
+      if (visitorLogs.length === 0) {
+        placeholder.classList.remove('hidden');
+        return;
+      }
+      placeholder.classList.add('hidden');
+
+      visitorLogs.forEach(v => {
+        // Desktop Row
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3">
+            <span class="font-bold text-slate-800 block text-[11px]">${formatDateTime(v.visited_at)}</span>
+            <span class="text-[9px] text-slate-400 font-mono">${v.id}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${v.device_type === 'Mobile Smartphone' ? 'bg-emerald-50 text-emerald-700 border border-emerald-300' : 'bg-blue-50 text-blue-700 border border-blue-300'}">
+              <i class="fa-solid ${v.device_type === 'Mobile Smartphone' ? 'fa-mobile' : 'fa-laptop'} mr-1"></i>${v.device_type}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-[11px] font-semibold text-slate-700">${v.os}</td>
+          <td class="py-2.5 px-3 text-[11px] font-semibold text-slate-700">${v.browser}</td>
+          <td class="py-2.5 px-3 text-[10px] text-slate-500 font-mono">${v.screen_resolution || '-'}</td>
+          <td class="py-2.5 px-3 text-[10px] font-mono text-emerald-800 font-bold">${v.ip_address || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+
+        // Mobile Card
+        const card = document.createElement('div');
+        card.className = "bg-white p-2.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1.5";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-800 flex items-center gap-1">
+              <i class="fa-solid ${v.device_type === 'Mobile Smartphone' ? 'fa-mobile text-emerald-600' : 'fa-laptop text-blue-600'}"></i>
+              ${v.os} • ${v.browser}
+            </span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${v.device_type === 'Mobile Smartphone' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}">${v.device_type}</span>
+          </div>
+          <div class="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-100">
+            <span>${formatDateTime(v.visited_at)}</span>
+            <span class="font-mono text-emerald-800 font-bold">IP: ${v.ip_address || '-'}</span>
+          </div>
+        `;
+        cardContainer.appendChild(card);
+      });
+    }
+
+    function exportDeviceLogsExcel() {
+      if (visitorLogs.length === 0) return alert("Belum ada log perangkat untuk diekspor.");
+
+      const wsData = [
+        ["LOG AUDIT DEVICE PENGUNJUNG SISTEM"],
+        [`Waktu Unduh: ${new Date().toLocaleString('id-ID')}`],
+        [],
+        ["NO", "ID LOG", "WAKTU AKSES", "DEVICE", "SISTEM OPERASI", "BROWSER", "RESOLUSI LAYAR", "IP ADDRESS", "USER AGENT"]
+      ];
+
+      visitorLogs.forEach((v, idx) => {
+        wsData.push([
+          idx + 1,
+          v.id,
+          formatDateTime(v.visited_at),
+          v.device_type,
+          v.os,
+          v.browser,
+          v.screen_resolution || "-",
+          v.ip_address || "-",
+          v.user_agent || "-"
+        ]);
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, "Log Device");
+      XLSX.writeFile(wb, `Audit_Device_Logs_${Date.now()}.xlsx`);
+    }
+
+    // 6. DATABASE SINKRONISASI
     async function refreshData() {
       if (!supabaseClient) {
         loadLocalData();
@@ -1004,8 +1281,21 @@
           loans = remoteLoans;
         }
 
+        // Ambil Log Perangkat dari Supabase
+        const { data: remoteLogs, error: logErr } = await supabaseClient
+          .from('visitor_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (!logErr && remoteLogs && remoteLogs.length > 0) {
+          visitorLogs = remoteLogs;
+        }
+
         saveToLocalStorageCache();
+        saveVisitorLogsCache();
         renderAll();
+        renderDeviceLogs();
       } catch (err) {
         console.warn("Supabase fallback local:", err);
         loadLocalData();
@@ -1015,9 +1305,12 @@
     function loadLocalData() {
       const localTools = localStorage.getItem('app_tools_cache');
       const localLoans = localStorage.getItem('app_loans_cache');
+      const localLogs = localStorage.getItem('app_visitor_logs_cache');
       if (localTools) tools = JSON.parse(localTools);
       if (localLoans) loans = JSON.parse(localLoans);
+      if (localLogs) visitorLogs = JSON.parse(localLogs);
       renderAll();
+      renderDeviceLogs();
     }
 
     function saveToLocalStorageCache() {
@@ -1029,7 +1322,7 @@
       }
     }
 
-    // 6. TRANSAKSI LOGIC (PINJAM & KEMBALI)
+    // 7. TRANSAKSI LOGIC (PINJAM & KEMBALI)
     async function handleBorrowSubmit(e) {
       e.preventDefault();
       const toolId = document.getElementById('borrowToolSelect').value;
@@ -1128,7 +1421,6 @@
       document.getElementById('returnModal').classList.add('hidden');
     }
 
-    // PERBAIKAN PENTING: PROSES PENGEMBALIAN FOTO DAN DATA TERSINKRON AKURAT
     async function handleReturnSubmit(e) {
       e.preventDefault();
       const loanId = document.getElementById('returnLoanId').value;
@@ -1148,7 +1440,6 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah Foto & Menyimpan...`;
 
       try {
-        // Upload foto pengembalian ke Supabase Storage (atau fallback DataURL)
         const photoUrl = await uploadToSupabaseStorage(photoData, `after_${loanId}`);
 
         const updateData = {
@@ -1177,7 +1468,6 @@
           }
         }
 
-        // Sinkronisasi Instan ke Array Lokal & Cache Browser
         if (loan) {
           Object.assign(loan, updateData);
           const tool = tools.find(t => t.id === loan.tool_id);
@@ -1191,8 +1481,6 @@
         closeReturnModal();
         alert("Pengembalian alat telah diverifikasi & foto fisik berhasil tersimpan!");
         renderAll();
-
-        // Buka langsung Berita Acara untuk verifikasi visual foto sebelum vs sesudah
         openDetailModal(loanId);
       } catch (err) {
         alert("Gagal memproses pengembalian: " + err.message);
@@ -1202,7 +1490,7 @@
       }
     }
 
-    // 7. EDIT & HAPUS LOGIC
+    // 8. EDIT & HAPUS LOGIC
     function openEditLoanModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1363,7 +1651,7 @@
       }
     }
 
-    // 8. RENDER LOGIC (FOTO SEBELUM DAN SESUDAH DITAMPILKAN SECARA ROBUST)
+    // 9. RENDER LOGIC
     function renderAll() {
       renderStats();
       renderLoans();
@@ -1457,7 +1745,7 @@
         `;
         tbody.appendChild(tr);
 
-        // Mobile Card View (Foto Sebelum & Sesudah Tampil Berdampingan dengan Jelas)
+        // Mobile Card View
         const card = document.createElement('div');
         card.className = "bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2";
         card.innerHTML = `
@@ -1478,7 +1766,6 @@
             }
           </div>
 
-          <!-- Dual Micro Photo Comparison (Sebelum vs Pengembalian) -->
           <div class="grid grid-cols-2 gap-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
             <div>
               <span class="text-[9px] text-slate-500 font-bold block mb-0.5">Foto Sebelum:</span>
@@ -1562,7 +1849,7 @@
       });
     }
 
-    // 9. SHARE WHATSAPP: TEKS BERSIH (100% BEBAS LINK)
+    // 10. SHARE WHATSAPP: TEKS BERSIH (100% BEBAS LINK)
     async function shareWhatsAppWithPhoto(loan) {
       if (!loan) return;
 
@@ -1624,13 +1911,13 @@
       window.open(waUrl, '_blank');
     }
 
-    // 10. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
+    // 11. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
     function openDetailModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
       currentDetailLoan = loan;
 
-      document.getElementById('docLoanId').textContent = `NO. REGISTRASI: ${loan.id}`;
+      document.getElementById('docLoanId').textContent = `NO. REG: ${loan.id}`;
       document.getElementById('docToolName').textContent = loan.tool_name;
       document.getElementById('docBorrowerName').textContent = loan.borrower_name;
       document.getElementById('docOfficerBorrow').textContent = loan.officer_borrow || '-';
@@ -1715,38 +2002,111 @@
       }
     }
 
-    function exportAllCSV() {
+    // 12. EXPORT EXCEL & CSV CORPORATE
+    function exportCorporateExcel() {
+      if (loans.length === 0) return alert("Belum ada data transaksi untuk diekspor.");
+
+      const now = new Date();
+      const printDate = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      const wsData = [
+        ["LAPORAN AUDIT & MUTASI SIRKULASI INVENTARIS ALAT KERJA"],
+        ["Sistem ToolTrack Enterprise - Manajemen Aset Operasional"],
+        [`Tanggal Unduh / Ekstraksi: ${printDate}`],
+        [`Total Mutasi: ${loans.length} Transaksi | Aktif Dipinjam: ${loans.filter(l=>l.status==='DIPINJAM').length} | Selesai: ${loans.filter(l=>l.status==='KEMBALI').length}`],
+        [],
+        [
+          "NO",
+          "ID TRANSAKSI",
+          "NAMA ALAT KERJA",
+          "PEMINJAM",
+          "NO. WHATSAPP",
+          "PETUGAS PENYERAH",
+          "WAKTU PINJAM",
+          "STATUS MUTASI",
+          "PETUGAS PENERIMA",
+          "WAKTU PENGEMBALIAN",
+          "KONDISI PENGEMBALIAN",
+          "CATATAN / KEPERLUAN"
+        ]
+      ];
+
+      loans.forEach((l, idx) => {
+        wsData.push([
+          idx + 1,
+          l.id,
+          l.tool_name,
+          l.borrower_name,
+          l.borrower_phone ? `'${l.borrower_phone}` : "-",
+          l.officer_borrow || "-",
+          formatDateTime(l.borrow_date),
+          l.status,
+          l.officer_return || "-",
+          l.return_date ? formatDateTime(l.return_date) : "-",
+          l.condition_return || "-",
+          l.notes_borrow || "-"
+        ]);
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+      ws['!cols'] = [
+        { wch: 5 },  { wch: 15 }, { wch: 30 }, { wch: 22 }, { wch: 18 },
+        { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 20 },
+        { wch: 22 }, { wch: 30 }
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, "Mutasi Alat");
+      XLSX.writeFile(wb, `Laporan_Mutasi_Alat_Corporate_${Date.now()}.xlsx`);
+    }
+
+    function exportCorporateCSV() {
       if (loans.length === 0) return alert("Belum ada data untuk diunduh.");
 
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "ID,Nama Alat,Peminjam,No WA,Petugas Pinjam,Tgl Pinjam,Status,Petugas Kembali,Tgl Kembali,Kondisi Kembali\n";
+      const now = new Date();
+      const printDate = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-      loans.forEach(l => {
+      let csvContent = "\uFEFF";
+      csvContent += `"LAPORAN AUDIT & MUTASI SIRKULASI INVENTARIS ALAT KERJA"\n`;
+      csvContent += `"Sistem ToolTrack Enterprise - Manajemen Aset Operasional"\n`;
+      csvContent += `"Tanggal Ekstraksi: ${printDate}"\n`;
+      csvContent += `"Total: ${loans.length} | Dipinjam: ${loans.filter(l=>l.status==='DIPINJAM').length} | Selesai: ${loans.filter(l=>l.status==='KEMBALI').length}"\n\n`;
+
+      csvContent += `"NO","ID TRANSAKSI","NAMA ALAT KERJA","NAMA PEMINJAM","NO WHATSAPP","PETUGAS PENYERAH","WAKTU PINJAM","STATUS","PETUGAS PENERIMA","WAKTU KEMBALI","KONDISI KEMBALI","CATATAN"\n`;
+
+      loans.forEach((l, idx) => {
+        const clean = (val) => String(val || '-').replace(/"/g, '""');
+        const phone = l.borrower_phone ? `=""${l.borrower_phone}""` : `"-"`;
         const row = [
-          `"${l.id}"`,
-          `"${l.tool_name}"`,
-          `"${l.borrower_name}"`,
-          `"${l.borrower_phone}"`,
-          `"${l.officer_borrow || '-'}"`,
-          `"${l.borrow_date}"`,
-          `"${l.status}"`,
-          `"${l.officer_return || '-'}"`,
-          `"${l.return_date || '-'}"`,
-          `"${l.condition_return || '-'}"`
+          idx + 1,
+          `"${clean(l.id)}"`,
+          `"${clean(l.tool_name)}"`,
+          `"${clean(l.borrower_name)}"`,
+          phone,
+          `"${clean(l.officer_borrow)}"`,
+          `"${clean(formatDateTime(l.borrow_date))}"`,
+          `"${clean(l.status)}"`,
+          `"${clean(l.officer_return)}"`,
+          `"${clean(l.return_date ? formatDateTime(l.return_date) : '-')}"`,
+          `"${clean(l.condition_return)}"`,
+          `"${clean(l.notes_borrow)}"`
         ];
         csvContent += row.join(",") + "\n";
       });
 
-      const encodedUri = encodeURI(csvContent);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Mutasi_Sirkulasi_Alat_${Date.now()}.csv`);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Laporan_Mutasi_Alat_Corporate_${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
 
-    // 11. TABS & UTILITIES
+    // 13. TABS & UTILITIES
     function switchTab(tabId) {
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -1819,8 +2179,10 @@
       alert("Alat baru berhasil ditambahkan!");
     }
 
+    // ON LOAD INIT
     window.addEventListener('DOMContentLoaded', () => {
       refreshData();
+      recordVisitorDeviceLog();
     });
   </script>
 </body>
