@@ -34,8 +34,9 @@
       touch-action: none;
       cursor: crosshair;
     }
+    /* Padding bawah lega agar tombol simpan dan form tidak tertutup nav dock */
     .mobile-safe-bottom {
-      padding-bottom: calc(7rem + env(safe-area-inset-bottom, 20px));
+      padding-bottom: calc(8.5rem + env(safe-area-inset-bottom, 24px));
     }
     ::-webkit-scrollbar {
       width: 4px;
@@ -66,7 +67,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-extrabold text-xs tracking-tight text-white uppercase">ToolTrack M-Banking</span>
-            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.0</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.2</span>
           </div>
           <p class="text-[10px] text-emerald-200/90 font-medium">Sirkulasi & Inspeksi Alat Kerja</p>
         </div>
@@ -88,6 +89,9 @@
       </button>
       <button onclick="switchTab('tools')" class="tab-btn px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-transparent text-emerald-200/70 hover:text-white flex items-center gap-1.5 transition" data-tab="tools">
         <i class="fa-solid fa-cubes"></i> Katalog Inventaris
+      </button>
+      <button onclick="switchTab('devicelogs')" class="tab-btn px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-transparent text-emerald-200/70 hover:text-white flex items-center gap-1.5 transition" data-tab="devicelogs">
+        <i class="fa-solid fa-mobile-screen-button"></i> Log Perangkat
       </button>
     </nav>
   </header>
@@ -131,7 +135,7 @@
         </div>
       </div>
 
-      <!-- Filters & Action Bar (Corporate Export Buttons) -->
+      <!-- Filters & Action Bar -->
       <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
         <div class="flex-1 flex gap-2">
           <div class="relative flex-1">
@@ -148,7 +152,7 @@
         <div class="flex items-center gap-1.5">
           <button onclick="exportCorporateExcel()" title="Download Excel Berformat Resmi" class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-xs">
             <i class="fa-solid fa-file-excel text-emerald-200"></i>
-            <span>Export Excel (.xlsx)</span>
+            <span>Export Excel</span>
           </button>
           <button onclick="exportCorporateCSV()" title="Download CSV UTF-8" class="flex-1 sm:flex-none px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-bold flex items-center justify-center gap-1 transition active:scale-95 shadow-2xs">
             <i class="fa-solid fa-file-csv text-slate-500"></i>
@@ -201,8 +205,8 @@
       </div>
     </section>
 
-    <!-- TAB 2: REGISTRASI PINJAM ALAT BARU -->
-    <section id="tab-borrow" class="hidden max-w-xl mx-auto space-y-3">
+    <!-- TAB 2: REGISTRASI PINJAM ALAT BARU (DENGAN SAFE SPACING) -->
+    <section id="tab-borrow" class="hidden max-w-xl mx-auto space-y-3 pb-8">
       <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
         <div class="border-b border-slate-100 pb-2.5 flex items-center justify-between">
           <div>
@@ -304,16 +308,22 @@
             <p class="text-[9px] text-slate-400">Goreskan jari tangan di layar HP.</p>
           </div>
 
-          <button type="submit" id="submitBorrowBtn" class="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.99] text-white font-bold rounded-xl text-xs tracking-wide shadow-md shadow-emerald-900/20 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-check-circle"></i>
-            <span>Simpan Peminjaman</span>
-          </button>
+          <!-- TOMBOL SIMPAN DENGAN JARAK AMAN -->
+          <div class="pt-2">
+            <button type="submit" id="submitBorrowBtn" class="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.99] text-white font-bold rounded-xl text-xs tracking-wide shadow-md shadow-emerald-900/20 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check-circle text-sm"></i>
+              <span>Simpan Peminjaman</span>
+            </button>
+          </div>
         </form>
       </div>
+
+      <!-- SPACER EKSTRA KHUSUS AGAR FORM TIDAK TERHALANG BOTTOM NAV DI HANDPHONE -->
+      <div class="h-20 w-full pointer-events-none md:hidden" aria-hidden="true"></div>
     </section>
 
     <!-- TAB 3: KATALOG MASTER ALAT -->
-    <section id="tab-tools" class="hidden space-y-3">
+    <section id="tab-tools" class="hidden space-y-3 pb-8">
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
         <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
           <div>
@@ -330,29 +340,108 @@
         </div>
         <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
       </div>
+      <div class="h-20 w-full pointer-events-none md:hidden" aria-hidden="true"></div>
     </section>
+
+    <!-- TAB 4: AUDIT LOG PERANGKAT PENGUNJUNG -->
+    <section id="tab-devicelogs" class="hidden space-y-3 pb-8">
+      <!-- Device Metrics Widget -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <div>
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-virus text-emerald-600"></i>
+              Audit Log Perangkat Pengunjung
+            </h2>
+            <p class="text-[10px] text-slate-500">Pencatatan jenis gawai, browser, dan alamat IP pengunjung sistem</p>
+          </div>
+          <button onclick="exportDeviceLogsExcel()" class="py-1 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-2xs">
+            <i class="fa-solid fa-file-excel text-emerald-600"></i>
+            <span>Export Log</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+            <span class="text-[9px] text-slate-400 font-bold uppercase block">Total Kunjungan</span>
+            <span id="statTotalVisits" class="text-base font-extrabold text-slate-800">0</span>
+          </div>
+          <div class="bg-emerald-50/50 p-2 rounded-xl border border-emerald-200">
+            <span class="text-[9px] text-emerald-700 font-bold uppercase block">Pengunjung HP</span>
+            <span id="statMobileVisits" class="text-base font-extrabold text-emerald-700">0</span>
+          </div>
+          <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-200">
+            <span class="text-[9px] text-blue-700 font-bold uppercase block">Desktop / PC</span>
+            <span id="statDesktopVisits" class="text-base font-extrabold text-blue-700">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed / Table Log Perangkat -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen-button text-emerald-600 text-xs"></i>
+            Aktivitas Akses Terakhir
+          </span>
+          <span id="deviceLogBadge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">0 Log</span>
+        </div>
+
+        <div class="hidden lg:block overflow-x-auto">
+          <table class="w-full text-left text-[11px] border-collapse">
+            <thead class="bg-slate-50 text-slate-600 uppercase font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Waktu Akses</th>
+                <th class="py-2.5 px-3">Tipe Device</th>
+                <th class="py-2.5 px-3">Sistem Operasi</th>
+                <th class="py-2.5 px-3">Browser</th>
+                <th class="py-2.5 px-3">Resolusi Layar</th>
+                <th class="py-2.5 px-3">Lokasi / IP</th>
+              </tr>
+            </thead>
+            <tbody id="deviceLogTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+          </table>
+        </div>
+
+        <div id="deviceLogCardContainer" class="lg:hidden p-2.5 space-y-2"></div>
+
+        <div id="noDeviceLogPlaceholder" class="hidden py-8 text-center">
+          <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-sm mb-1.5">
+            <i class="fa-solid fa-laptop-code"></i>
+          </div>
+          <p class="font-bold text-slate-600 text-xs">Belum ada riwayat akses perangkat</p>
+        </div>
+      </div>
+      <div class="h-20 w-full pointer-events-none md:hidden" aria-hidden="true"></div>
+    </section>
+
   </main>
 
   <!-- ========================================================
        MOBILE FLOATING BOTTOM NAV DOCK
   ======================================================== -->
-  <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-2 left-3 right-3 bg-white/90 backdrop-blur-lg border border-slate-200/90 rounded-2xl z-40 shadow-lg px-2 py-1.5">
-    <div class="grid grid-cols-3 items-center text-center">
+  <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-2 left-3 right-3 bg-white/95 backdrop-blur-lg border border-slate-200/90 rounded-2xl z-40 shadow-lg px-2 py-1.5">
+    <div class="grid grid-cols-4 items-center text-center">
       <button onclick="switchTab('dashboard')" class="mobile-tab-btn flex flex-col items-center py-1 text-emerald-800 font-bold transition active:scale-95" data-tab="dashboard">
         <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
-        <span class="text-[9px] uppercase tracking-wider">Mutasi</span>
+        <span class="text-[8px] uppercase tracking-wider">Mutasi</span>
       </button>
 
       <button onclick="switchTab('borrow')" class="mobile-tab-btn flex flex-col items-center py-0.5 text-slate-400 hover:text-emerald-700 transition active:scale-95" data-tab="borrow">
-        <div class="w-10 h-10 -mt-5 rounded-2xl bg-gradient-to-tr from-emerald-700 to-teal-600 text-white flex items-center justify-center shadow-md border-2 border-white">
-          <i class="fa-solid fa-plus text-sm"></i>
+        <div class="w-9 h-9 -mt-4 rounded-2xl bg-gradient-to-tr from-emerald-700 to-teal-600 text-white flex items-center justify-center shadow-md border-2 border-white">
+          <i class="fa-solid fa-plus text-xs"></i>
         </div>
-        <span class="text-[9px] uppercase font-bold tracking-wider mt-0.5">Pinjam</span>
+        <span class="text-[8px] uppercase font-bold tracking-wider mt-0.5">Pinjam</span>
       </button>
 
       <button onclick="switchTab('tools')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-400 hover:text-emerald-800 transition active:scale-95" data-tab="tools">
         <i class="fa-solid fa-toolbox text-base mb-0.5"></i>
-        <span class="text-[9px] uppercase tracking-wider">Katalog</span>
+        <span class="text-[8px] uppercase tracking-wider">Katalog</span>
+      </button>
+
+      <button onclick="switchTab('devicelogs')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-400 hover:text-emerald-800 transition active:scale-95" data-tab="devicelogs">
+        <i class="fa-solid fa-mobile-screen-button text-base mb-0.5"></i>
+        <span class="text-[8px] uppercase tracking-wider">Device</span>
       </button>
     </div>
   </nav>
@@ -475,10 +564,7 @@
         <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <!-- KONTEN BERITA ACARA DENGAN TATA LETAK TAJAM & RESMI -->
       <div id="pdfContentArea" class="bg-white p-6 rounded-xl border border-slate-300 space-y-4 text-xs font-sans">
-        
-        <!-- KOP SURAT RESMI -->
         <div class="text-center pb-2 border-b-2 border-slate-900">
           <h2 class="font-black text-sm uppercase tracking-wide text-slate-900">BERITA ACARA PINJAM PAKAI ALAT KERJA</h2>
           <p class="text-[10px] text-slate-500 font-semibold tracking-wider uppercase mt-0.5">Sistem Manajemen Aset & Inventaris Operasional</p>
@@ -488,7 +574,6 @@
           </div>
         </div>
 
-        <!-- TABEL RINCIAN TRANSAKSI -->
         <div class="grid grid-cols-2 gap-2 text-[11px]">
           <div class="p-2 rounded bg-slate-50 border border-slate-200">
             <span class="text-[9px] text-slate-400 uppercase font-bold block">Nama Alat Kerja</span>
@@ -524,7 +609,6 @@
           </div>
         </div>
 
-        <!-- DOKUMENTASI FOTO FISIK (BEFORE VS AFTER) -->
         <div>
           <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">Dokumentasi Kondisi Fisik Alat</span>
           <div class="grid grid-cols-2 gap-2">
@@ -544,7 +628,6 @@
           </div>
         </div>
 
-        <!-- KOLOM TANDA TANGAN -->
         <div class="pt-2">
           <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">Pengesahan Para Pihak</span>
           <div class="grid grid-cols-2 gap-2">
@@ -567,10 +650,8 @@
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- TOMBOL AKSI MODAL -->
       <div class="flex items-center gap-2 pt-1">
         <button id="btnDownloadPDF" onclick="generatePDF()" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
           <i class="fa-solid fa-file-pdf"></i> Download PDF Tajam (HD)
@@ -756,6 +837,7 @@
       { id: "ALT-004", name: "Gerinda Tangan Maktec 4 Inch", category: "Power Tools", condition: "Baik", status: "TERSEDIA" }
     ];
     let loans = [];
+    let visitorLogs = [];
     let currentDetailLoan = null;
 
     // 2. SIGNATURE PAD CLASS
@@ -986,7 +1068,180 @@
       }
     }
 
-    // 5. DATABASE SINKRONISASI
+    // 5. AUTO LOG DEVICE PENGUNJUNG
+    function parseDeviceInfo() {
+      const ua = navigator.userAgent || '';
+      let deviceType = "Desktop / Laptop";
+      let os = "Unknown OS";
+      let browser = "Unknown Browser";
+
+      if (/tablet|ipad|playbook|silk/i.test(ua)) {
+        deviceType = "Tablet";
+      } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/i.test(ua)) {
+        deviceType = "Mobile Smartphone";
+      }
+
+      if (/Windows/i.test(ua)) os = "Windows";
+      else if (/Android/i.test(ua)) os = "Android";
+      else if (/iPhone|iPad|iPod/i.test(ua)) os = "Apple iOS";
+      else if (/Macintosh|Mac OS X/i.test(ua)) os = "macOS";
+      else if (/Linux/i.test(ua)) os = "Linux";
+
+      if (/Chrome/i.test(ua) && !/Edge|Edg|OPR/i.test(ua)) browser = "Google Chrome";
+      else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = "Apple Safari";
+      else if (/Edg/i.test(ua)) browser = "Microsoft Edge";
+      else if (/Firefox/i.test(ua)) browser = "Mozilla Firefox";
+      else if (/OPR|Opera/i.test(ua)) browser = "Opera";
+      else if (/SamsungBrowser/i.test(ua)) browser = "Samsung Internet";
+
+      const screenRes = `${window.screen.width}x${window.screen.height} (${window.innerWidth}x${window.innerHeight} viewport)`;
+
+      return { deviceType, os, browser, screenRes, userAgent: ua };
+    }
+
+    async function recordVisitorDeviceLog() {
+      const lastLogged = sessionStorage.getItem('device_logged_time');
+      const nowTs = Date.now();
+      if (lastLogged && (nowTs - parseInt(lastLogged)) < 30 * 60 * 1000) {
+        return;
+      }
+
+      const info = parseDeviceInfo();
+      const logId = "DEV-" + Date.now().toString().slice(-6);
+
+      let ip = "Checking...";
+      try {
+        const res = await fetch("https://api.ipify.org?format=json", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          ip = json.ip;
+        }
+      } catch (err) {
+        ip = "Local/Private";
+      }
+
+      const logRecord = {
+        id: logId,
+        device_type: info.deviceType,
+        os: info.os,
+        browser: info.browser,
+        screen_resolution: info.screenRes,
+        ip_address: ip,
+        city: "-",
+        isp: "-",
+        user_agent: info.userAgent,
+        visited_at: new Date().toISOString()
+      };
+
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('visitor_logs').insert([logRecord]);
+        } catch (e) {
+          console.warn("Visitor log insert error:", e);
+        }
+      }
+
+      visitorLogs.unshift(logRecord);
+      sessionStorage.setItem('device_logged_time', nowTs.toString());
+      saveVisitorLogsCache();
+      renderDeviceLogs();
+    }
+
+    function saveVisitorLogsCache() {
+      try {
+        localStorage.setItem('app_visitor_logs_cache', JSON.stringify(visitorLogs.slice(0, 100)));
+      } catch (e) {}
+    }
+
+    function renderDeviceLogs() {
+      document.getElementById('statTotalVisits').textContent = visitorLogs.length;
+      document.getElementById('statMobileVisits').textContent = visitorLogs.filter(v => v.device_type === "Mobile Smartphone").length;
+      document.getElementById('statDesktopVisits').textContent = visitorLogs.filter(v => v.device_type === "Desktop / Laptop").length;
+      document.getElementById('deviceLogBadge').textContent = `${visitorLogs.length} Log`;
+
+      const tbody = document.getElementById('deviceLogTableBody');
+      const cardContainer = document.getElementById('deviceLogCardContainer');
+      const placeholder = document.getElementById('noDeviceLogPlaceholder');
+
+      tbody.innerHTML = '';
+      cardContainer.innerHTML = '';
+
+      if (visitorLogs.length === 0) {
+        placeholder.classList.remove('hidden');
+        return;
+      }
+      placeholder.classList.add('hidden');
+
+      visitorLogs.forEach(v => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3">
+            <span class="font-bold text-slate-800 block text-[11px]">${formatDateTime(v.visited_at)}</span>
+            <span class="text-[9px] text-slate-400 font-mono">${v.id}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${v.device_type === 'Mobile Smartphone' ? 'bg-emerald-50 text-emerald-700 border border-emerald-300' : 'bg-blue-50 text-blue-700 border border-blue-300'}">
+              <i class="fa-solid ${v.device_type === 'Mobile Smartphone' ? 'fa-mobile' : 'fa-laptop'} mr-1"></i>${v.device_type}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-[11px] font-semibold text-slate-700">${v.os}</td>
+          <td class="py-2.5 px-3 text-[11px] font-semibold text-slate-700">${v.browser}</td>
+          <td class="py-2.5 px-3 text-[10px] text-slate-500 font-mono">${v.screen_resolution || '-'}</td>
+          <td class="py-2.5 px-3 text-[10px] font-mono text-emerald-800 font-bold">${v.ip_address || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+
+        const card = document.createElement('div');
+        card.className = "bg-white p-2.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1.5";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-800 flex items-center gap-1">
+              <i class="fa-solid ${v.device_type === 'Mobile Smartphone' ? 'fa-mobile text-emerald-600' : 'fa-laptop text-blue-600'}"></i>
+              ${v.os} • ${v.browser}
+            </span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${v.device_type === 'Mobile Smartphone' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}">${v.device_type}</span>
+          </div>
+          <div class="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-100">
+            <span>${formatDateTime(v.visited_at)}</span>
+            <span class="font-mono text-emerald-800 font-bold">IP: ${v.ip_address || '-'}</span>
+          </div>
+        `;
+        cardContainer.appendChild(card);
+      });
+    }
+
+    function exportDeviceLogsExcel() {
+      if (visitorLogs.length === 0) return alert("Belum ada log perangkat untuk diekspor.");
+
+      const wsData = [
+        ["LOG AUDIT DEVICE PENGUNJUNG SISTEM"],
+        [`Waktu Unduh: ${new Date().toLocaleString('id-ID')}`],
+        [],
+        ["NO", "ID LOG", "WAKTU AKSES", "DEVICE", "SISTEM OPERASI", "BROWSER", "RESOLUSI LAYAR", "IP ADDRESS", "USER AGENT"]
+      ];
+
+      visitorLogs.forEach((v, idx) => {
+        wsData.push([
+          idx + 1,
+          v.id,
+          formatDateTime(v.visited_at),
+          v.device_type,
+          v.os,
+          v.browser,
+          v.screen_resolution || "-",
+          v.ip_address || "-",
+          v.user_agent || "-"
+        ]);
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, "Log Device");
+      XLSX.writeFile(wb, `Audit_Device_Logs_${Date.now()}.xlsx`);
+    }
+
+    // 6. DATABASE SINKRONISASI
     async function refreshData() {
       if (!supabaseClient) {
         loadLocalData();
@@ -1012,8 +1267,20 @@
           loans = remoteLoans;
         }
 
+        const { data: remoteLogs, error: logErr } = await supabaseClient
+          .from('visitor_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (!logErr && remoteLogs && remoteLogs.length > 0) {
+          visitorLogs = remoteLogs;
+        }
+
         saveToLocalStorageCache();
+        saveVisitorLogsCache();
         renderAll();
+        renderDeviceLogs();
       } catch (err) {
         console.warn("Supabase fallback local:", err);
         loadLocalData();
@@ -1023,9 +1290,12 @@
     function loadLocalData() {
       const localTools = localStorage.getItem('app_tools_cache');
       const localLoans = localStorage.getItem('app_loans_cache');
+      const localLogs = localStorage.getItem('app_visitor_logs_cache');
       if (localTools) tools = JSON.parse(localTools);
       if (localLoans) loans = JSON.parse(localLoans);
+      if (localLogs) visitorLogs = JSON.parse(localLogs);
       renderAll();
+      renderDeviceLogs();
     }
 
     function saveToLocalStorageCache() {
@@ -1037,7 +1307,7 @@
       }
     }
 
-    // 6. TRANSAKSI LOGIC (PINJAM & KEMBALI)
+    // 7. TRANSAKSI LOGIC (PINJAM & KEMBALI)
     async function handleBorrowSubmit(e) {
       e.preventDefault();
       const toolId = document.getElementById('borrowToolSelect').value;
@@ -1107,7 +1377,7 @@
         alert("Gagal menyimpan: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-check-circle"></i> <span>Simpan Peminjaman</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-check-circle text-sm"></i> <span>Simpan Peminjaman</span>`;
       }
     }
 
@@ -1205,7 +1475,7 @@
       }
     }
 
-    // 7. EDIT & HAPUS LOGIC
+    // 8. EDIT & HAPUS LOGIC
     function openEditLoanModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1366,7 +1636,7 @@
       }
     }
 
-    // 8. RENDER LOGIC
+    // 9. RENDER LOGIC
     function renderAll() {
       renderStats();
       renderLoans();
@@ -1411,7 +1681,6 @@
       placeholder.classList.add('hidden');
 
       filtered.forEach(loan => {
-        // Desktop Row
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
         tr.innerHTML = `
@@ -1460,7 +1729,6 @@
         `;
         tbody.appendChild(tr);
 
-        // Mobile Card View
         const card = document.createElement('div');
         card.className = "bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2";
         card.innerHTML = `
@@ -1564,7 +1832,7 @@
       });
     }
 
-    // 9. SHARE WHATSAPP: TEKS BERSIH (100% BEBAS LINK)
+    // 10. SHARE WHATSAPP: TEKS BERSIH (100% BEBAS LINK)
     async function shareWhatsAppWithPhoto(loan) {
       if (!loan) return;
 
@@ -1626,7 +1894,7 @@
       window.open(waUrl, '_blank');
     }
 
-    // 10. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
+    // 11. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
     function openDetailModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1717,22 +1985,19 @@
       }
     }
 
-    // ========================================================
-    // 11. EXPORT EXCEL (.XLSX) & CSV CORPORATE MODERN
-    // ========================================================
+    // 12. EXPORT EXCEL & CSV CORPORATE
     function exportCorporateExcel() {
       if (loans.length === 0) return alert("Belum ada data transaksi untuk diekspor.");
 
       const now = new Date();
       const printDate = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-      // 1. Data Struktur dengan Header Corporate
       const wsData = [
         ["LAPORAN AUDIT & MUTASI SIRKULASI INVENTARIS ALAT KERJA"],
         ["Sistem ToolTrack Enterprise - Manajemen Aset Operasional"],
         [`Tanggal Unduh / Ekstraksi: ${printDate}`],
         [`Total Mutasi: ${loans.length} Transaksi | Aktif Dipinjam: ${loans.filter(l=>l.status==='DIPINJAM').length} | Selesai: ${loans.filter(l=>l.status==='KEMBALI').length}`],
-        [], // Baris kosong pemisah
+        [],
         [
           "NO",
           "ID TRANSAKSI",
@@ -1769,20 +2034,10 @@
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-      // Lebar Kolom Otomatis yang Rapi & Proporsional
       ws['!cols'] = [
-        { wch: 5 },  // No
-        { wch: 15 }, // ID
-        { wch: 30 }, // Alat
-        { wch: 22 }, // Peminjam
-        { wch: 18 }, // WA
-        { wch: 20 }, // Petugas Pinjam
-        { wch: 20 }, // Waktu Pinjam
-        { wch: 15 }, // Status
-        { wch: 20 }, // Petugas Kembali
-        { wch: 20 }, // Waktu Kembali
-        { wch: 22 }, // Kondisi Kembali
-        { wch: 30 }  // Catatan
+        { wch: 5 },  { wch: 15 }, { wch: 30 }, { wch: 22 }, { wch: 18 },
+        { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 20 },
+        { wch: 22 }, { wch: 30 }
       ];
 
       XLSX.utils.book_append_sheet(wb, ws, "Mutasi Alat");
@@ -1795,16 +2050,12 @@
       const now = new Date();
       const printDate = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-      // UTF-8 BOM (\uFEFF) agar Microsoft Excel langsung membaca aksen & font tanpa encoding error
       let csvContent = "\uFEFF";
-      
-      // Header Metadata Corporate
       csvContent += `"LAPORAN AUDIT & MUTASI SIRKULASI INVENTARIS ALAT KERJA"\n`;
       csvContent += `"Sistem ToolTrack Enterprise - Manajemen Aset Operasional"\n`;
       csvContent += `"Tanggal Ekstraksi: ${printDate}"\n`;
       csvContent += `"Total: ${loans.length} | Dipinjam: ${loans.filter(l=>l.status==='DIPINJAM').length} | Selesai: ${loans.filter(l=>l.status==='KEMBALI').length}"\n\n`;
 
-      // Header Tabel Kolom
       csvContent += `"NO","ID TRANSAKSI","NAMA ALAT KERJA","NAMA PEMINJAM","NO WHATSAPP","PETUGAS PENYERAH","WAKTU PINJAM","STATUS","PETUGAS PENERIMA","WAKTU KEMBALI","KONDISI KEMBALI","CATATAN"\n`;
 
       loans.forEach((l, idx) => {
@@ -1838,7 +2089,7 @@
       URL.revokeObjectURL(url);
     }
 
-    // 12. TABS & UTILITIES
+    // 13. TABS & UTILITIES
     function switchTab(tabId) {
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -1911,8 +2162,10 @@
       alert("Alat baru berhasil ditambahkan!");
     }
 
+    // ON LOAD INIT
     window.addEventListener('DOMContentLoaded', () => {
       refreshData();
+      recordVisitorDeviceLog();
     });
   </script>
 </body>
