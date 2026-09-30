@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>Sistem Sirkulasi & Inventaris Alat Kerja</title>
-  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, katalog alat berfoto & merk, berita acara digital PDF, dan export Excel/CSV corporate." />
+  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, pencarian alat interaktif, berita acara digital PDF, dan export Excel/CSV corporate." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#064e3b" />
 
@@ -66,7 +66,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-extrabold text-xs tracking-tight text-white uppercase">ToolTrack M-Banking</span>
-            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.5</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.6</span>
           </div>
           <p class="text-[10px] text-emerald-200/90 font-medium">Sirkulasi & Inventaris Alat Kerja</p>
         </div>
@@ -78,7 +78,7 @@
       </button>
     </div>
 
-    <!-- Desktop Tabs -->
+    <!-- Desktop Navigation Tabs -->
     <nav class="hidden md:flex border-t border-emerald-700/50 bg-emerald-950/70 px-6 max-w-5xl mx-auto">
       <button onclick="switchTab('dashboard')" class="tab-btn active-tab px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-emerald-400 text-emerald-300 flex items-center gap-1.5 transition" data-tab="dashboard">
         <i class="fa-solid fa-chart-pie"></i> Mutasi & Beranda
@@ -216,11 +216,29 @@
         </div>
 
         <form id="borrowForm" onsubmit="handleBorrowSubmit(event)" class="space-y-3 text-xs">
+          
+          <!-- MODEL SEARCH PENCARIAN ALAT INVENTARIS (BARU & INTERAKTIF) -->
           <div>
             <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih Alat Inventaris <span class="text-red-500">*</span></label>
-            <select id="borrowToolSelect" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:border-emerald-600">
-              <option value="">-- Pilih Alat yang Tersedia --</option>
-            </select>
+            
+            <!-- Box Alat Terpilih (Default Kosong / Klik untuk Cari) -->
+            <div id="selectedToolBox" onclick="openToolSearchModal()" class="w-full p-2.5 bg-slate-50 hover:bg-emerald-50/40 border border-slate-200 hover:border-emerald-400 rounded-xl cursor-pointer transition flex items-center justify-between group">
+              <div class="flex items-center gap-2.5 overflow-hidden">
+                <div id="selectedToolImgContainer" class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center shrink-0 overflow-hidden text-slate-400">
+                  <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </div>
+                <div class="truncate">
+                  <span id="selectedToolNameText" class="font-bold text-slate-700 text-xs block group-hover:text-emerald-800 truncate">-- Ketuk untuk Cari & Pilih Alat --</span>
+                  <span id="selectedToolSubText" class="text-[10px] text-slate-400 block">Ketik nama atau merk alat yang tersedia</span>
+                </div>
+              </div>
+              <button type="button" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-emerald-700 font-bold text-[10px] shadow-2xs group-hover:bg-emerald-700 group-hover:text-white transition shrink-0">
+                Pilih
+              </button>
+            </div>
+
+            <!-- Input Tersembunyi untuk Validasi Form & Nilai ID Alat -->
+            <input type="hidden" id="borrowToolSelect" required />
           </div>
 
           <div class="grid grid-cols-2 gap-2">
@@ -317,7 +335,7 @@
       <div class="h-20 w-full pointer-events-none md:hidden" aria-hidden="true"></div>
     </section>
 
-    <!-- TAB 3: KATALOG MASTER ALAT (BERFOTO & BERMERK) -->
+    <!-- TAB 3: KATALOG MASTER ALAT -->
     <section id="tab-tools" class="hidden space-y-3 pb-8">
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
         <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
@@ -339,6 +357,52 @@
     </section>
 
   </main>
+
+  <!-- ========================================================
+       MODAL PENCARIAN ALAT (SEARCH MODEL)
+  ======================================================== -->
+  <div id="toolSearchModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-4 shadow-2xl space-y-3 my-auto max-h-[88vh] flex flex-col">
+      
+      <!-- Search Input Header -->
+      <div class="flex items-center justify-between border-b pb-2.5">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Cari Alat Inventaris</h3>
+        </div>
+        <button onclick="closeToolSearchModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-sm"></i></button>
+      </div>
+
+      <!-- Live Search Box -->
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" id="toolModalSearchInput" oninput="filterToolsInModal()" placeholder="Ketik nama alat, merk (cth: Bosch), atau ID..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600 transition" />
+      </div>
+
+      <!-- Result Count Info -->
+      <div class="flex items-center justify-between px-1 text-[10px] text-slate-400">
+        <span>Menampilkan alat berstatus <strong class="text-emerald-700">TERSEDIA</strong></span>
+        <span id="toolSearchCountBadge" class="font-mono">0 Alat</span>
+      </div>
+
+      <!-- Tool Search List Feed (Scrollable) -->
+      <div id="toolSearchListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100 pr-1 space-y-1 max-h-80">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- No Tool Found Placeholder -->
+      <div id="noToolFoundPlaceholder" class="hidden py-8 text-center">
+        <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-sm mb-1.5">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <p class="font-bold text-slate-600 text-xs">Tidak ada alat yang cocok</p>
+        <p class="text-[10px] text-slate-400 mt-0.5">Coba kata kunci lain atau pastikan alat berstatus TERSEDIA.</p>
+      </div>
+
+    </div>
+  </div>
 
   <!-- ========================================================
        MOBILE FLOATING BOTTOM NAV DOCK
@@ -585,9 +649,7 @@
     </div>
   </div>
 
-  <!-- ========================================================
-       MODAL 3: TAMBAH MASTER ALAT (DILENGKAPI FOTO & MERK)
-  ======================================================== -->
+  <!-- MODAL 3: TAMBAH MASTER ALAT -->
   <div id="addToolModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b pb-2">
@@ -657,9 +719,7 @@
     </div>
   </div>
 
-  <!-- ========================================================
-       MODAL 4: EDIT MASTER ALAT (DILENGKAPI FOTO & MERK)
-  ======================================================== -->
+  <!-- MODAL 4: EDIT MASTER ALAT -->
   <div id="editToolModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b pb-2">
@@ -845,7 +905,7 @@
       console.warn("Supabase init error:", e);
     }
 
-    // STATE IN-MEMORY (BERMERK & BERFOTO DEFAULT)
+    // STATE IN-MEMORY
     let tools = [
       { id: "ALT-001", name: "Bor Tangan Cordless 18V", brand: "Bosch", condition: "Baik", status: "TERSEDIA", photo: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=400&q=80" },
       { id: "ALT-002", name: "Multimeter Digital CD800a", brand: "Sanwa", condition: "Baik", status: "TERSEDIA", photo: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80" },
@@ -1054,7 +1114,6 @@
       return new Blob([u8arr], { type: mime });
     }
 
-    // 4. STORAGE SUPABASE UPLOADER
     async function uploadToSupabaseStorage(base64Data, filename) {
       if (!supabaseClient || !base64Data || !base64Data.startsWith('data:image')) {
         return base64Data;
@@ -1083,7 +1142,7 @@
       }
     }
 
-    // 5. DEVICE DETECTOR ENGINE
+    // 4. DEVICE DETECTOR ENGINE
     function parseDeviceInfo() {
       const ua = navigator.userAgent || '';
       let os = "Windows PC";
@@ -1104,6 +1163,105 @@
 
       const compactName = `${os} (${browser})`;
       return { compactName };
+    }
+
+    // ========================================================
+    // 5. FITUR SEARCH MODEL: PENCARIAN ALAT INVENTARIS
+    // ========================================================
+    function openToolSearchModal() {
+      document.getElementById('toolModalSearchInput').value = '';
+      filterToolsInModal();
+      document.getElementById('toolSearchModal').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('toolModalSearchInput').focus();
+      }, 100);
+    }
+
+    function closeToolSearchModal() {
+      document.getElementById('toolSearchModal').classList.add('hidden');
+    }
+
+    function filterToolsInModal() {
+      const query = (document.getElementById('toolModalSearchInput').value || '').toLowerCase().trim();
+      const container = document.getElementById('toolSearchListContainer');
+      const placeholder = document.getElementById('noToolFoundPlaceholder');
+      const countBadge = document.getElementById('toolSearchCountBadge');
+
+      container.innerHTML = '';
+
+      // Hanya tampilkan alat yang statusnya TERSEDIA
+      const availableTools = tools.filter(t => t.status === 'TERSEDIA');
+
+      const filtered = availableTools.filter(t => {
+        const matchName = (t.name || '').toLowerCase().includes(query);
+        const matchBrand = (t.brand || t.category || '').toLowerCase().includes(query);
+        const matchId = (t.id || '').toLowerCase().includes(query);
+        return matchName || matchBrand || matchId;
+      });
+
+      countBadge.textContent = `${filtered.length} Tersedia`;
+
+      if (filtered.length === 0) {
+        placeholder.classList.remove('hidden');
+        return;
+      }
+      placeholder.classList.add('hidden');
+
+      filtered.forEach(tool => {
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-xl hover:bg-emerald-50/70 border border-transparent hover:border-emerald-200 transition cursor-pointer flex items-center justify-between group";
+        item.onclick = () => selectToolFromSearch(tool);
+
+        const brandLabel = tool.brand || tool.category || "Umum";
+        const thumbHtml = tool.photo ? 
+          `<img src="${tool.photo}" alt="${tool.name}" class="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0" />` : 
+          `<div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-100 text-xs"><i class="fa-solid fa-toolbox"></i></div>`;
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            ${thumbHtml}
+            <div class="truncate">
+              <span class="font-bold text-slate-800 text-xs block group-hover:text-emerald-800 truncate">${tool.name}</span>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-100/70 text-emerald-800 rounded font-mono">${brandLabel}</span>
+                <span class="text-[9px] text-slate-400 font-mono">${tool.id}</span>
+                <span class="text-[9px] text-slate-400">• Kondisi: ${tool.condition || 'Baik'}</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="px-2 py-1 bg-emerald-700 text-white rounded-lg text-[10px] font-bold shadow-2xs group-hover:bg-emerald-800 shrink-0">
+            Pilih
+          </button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function selectToolFromSearch(tool) {
+      document.getElementById('borrowToolSelect').value = tool.id;
+
+      // Update tampilan box preview di form
+      const brandLabel = tool.brand || tool.category || "Umum";
+      document.getElementById('selectedToolNameText').textContent = tool.name;
+      document.getElementById('selectedToolSubText').textContent = `Merk: ${brandLabel} • ID: ${tool.id} • Kondisi: ${tool.condition || 'Baik'}`;
+
+      const imgContainer = document.getElementById('selectedToolImgContainer');
+      if (tool.photo) {
+        imgContainer.innerHTML = `<img src="${tool.photo}" alt="${tool.name}" class="w-full h-full object-cover" />`;
+      } else {
+        imgContainer.innerHTML = `<i class="fa-solid fa-toolbox text-xs text-emerald-700"></i>`;
+      }
+
+      document.getElementById('selectedToolBox').classList.add('bg-emerald-50/50', 'border-emerald-300');
+      closeToolSearchModal();
+    }
+
+    function resetSelectedTool() {
+      document.getElementById('borrowToolSelect').value = '';
+      document.getElementById('selectedToolNameText').textContent = '-- Ketuk untuk Cari & Pilih Alat --';
+      document.getElementById('selectedToolSubText').textContent = 'Ketik nama atau merk alat yang tersedia';
+      document.getElementById('selectedToolImgContainer').innerHTML = `<i class="fa-solid fa-magnifying-glass text-xs"></i>`;
+      document.getElementById('selectedToolBox').classList.remove('bg-emerald-50/50', 'border-emerald-300');
     }
 
     // 6. DATABASE SINKRONISASI
@@ -1222,6 +1380,7 @@
 
         alert("Peminjaman berhasil dicatat!");
         document.getElementById('borrowForm').reset();
+        resetSelectedTool();
         removePhoto('borrow');
         clearSignature('borrow');
         switchTab('dashboard');
@@ -1426,7 +1585,7 @@
       }
     }
 
-    // MASTER ALAT (EDIT & HAPUS DENGAN FOTO & MERK)
+    // MASTER ALAT (EDIT & HAPUS)
     function openEditToolModal(toolId) {
       const tool = tools.find(t => t.id === toolId);
       if (!tool) return;
@@ -1474,7 +1633,7 @@
         const updatedFields = {
           name: document.getElementById('editToolName').value.trim(),
           brand: document.getElementById('editToolBrand').value.trim(),
-          category: document.getElementById('editToolBrand').value.trim(), // sync ke category jika kolom DB lama
+          category: document.getElementById('editToolBrand').value.trim(),
           condition: document.getElementById('editToolCondition').value,
           status: document.getElementById('editToolStatus').value,
           photo: photoUrl
@@ -1483,7 +1642,6 @@
         if (supabaseClient) {
           const { error } = await supabaseClient.from('tools').update(updatedFields).eq('id', toolId);
           if (error) {
-            // fallback jika kolom photo belum ada di DB
             const { photo, ...fallbackFields } = updatedFields;
             await supabaseClient.from('tools').update(fallbackFields).eq('id', toolId);
           }
@@ -1532,7 +1690,6 @@
     function renderAll() {
       renderStats();
       renderLoans();
-      renderToolsSelect();
       renderToolsGrid();
     }
 
@@ -1551,6 +1708,7 @@
         const matchSearch = (l.tool_name || '').toLowerCase().includes(search) ||
                             (l.borrower_name || '').toLowerCase().includes(search) ||
                             (l.officer_borrow || '').toLowerCase().includes(search) ||
+                            (l.device_borrow || '').toLowerCase().includes(search) ||
                             (l.borrower_phone || '').includes(search) ||
                             (l.id || '').toLowerCase().includes(search);
         const matchStatus = statusFilter === 'ALL' || l.status === statusFilter;
@@ -1678,22 +1836,7 @@
       });
     }
 
-    function renderToolsSelect() {
-      const select = document.getElementById('borrowToolSelect');
-      select.innerHTML = '<option value="">-- Pilih Alat yang Tersedia --</option>';
-      tools.forEach(tool => {
-        const opt = document.createElement('option');
-        opt.value = tool.id;
-        const brandLabel = tool.brand || tool.category || 'Umum';
-        opt.textContent = `${tool.name} [Merk: ${brandLabel}] (${tool.status})`;
-        if (tool.status !== 'TERSEDIA') {
-          opt.disabled = true;
-        }
-        select.appendChild(opt);
-      });
-    }
-
-    // RENDER KATALOG MASTER ALAT DENGAN FOTO FISIK & MERK
+    // RENDER KATALOG MASTER ALAT
     function renderToolsGrid() {
       const grid = document.getElementById('toolsGrid');
       grid.innerHTML = '';
@@ -1907,7 +2050,7 @@
       }
     }
 
-    // 12. EXPORT EXCEL & CSV CORPORATE (DILENGKAPI DATA MERK & DEVICE)
+    // 12. EXPORT EXCEL & CSV CORPORATE
     function exportCorporateExcel() {
       if (loans.length === 0) return alert("Belum ada data transaksi untuk diekspor.");
 
@@ -2106,7 +2249,6 @@
         if (supabaseClient) {
           const { error } = await supabaseClient.from('tools').insert([newTool]);
           if (error) {
-            // fallback jika kolom photo belum ada di DB Supabase
             const { photo, ...fallbackTool } = newTool;
             await supabaseClient.from('tools').insert([fallbackTool]);
           }
