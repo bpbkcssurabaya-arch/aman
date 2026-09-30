@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>Sistem Sirkulasi & Inventaris Alat Kerja</title>
-  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, berita acara digital PDF tajam A4, dan WhatsApp tanpa link." />
+  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, berita acara digital PDF tajam A4, dan export Excel/CSV corporate." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#064e3b" />
 
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SheetJS (XLSX) untuk Export Excel & CSV Corporate Asli -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- jsPDF & html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -64,7 +66,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-extrabold text-xs tracking-tight text-white uppercase">ToolTrack M-Banking</span>
-            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v2.9</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.0</span>
           </div>
           <p class="text-[10px] text-emerald-200/90 font-medium">Sirkulasi & Inspeksi Alat Kerja</p>
         </div>
@@ -129,7 +131,7 @@
         </div>
       </div>
 
-      <!-- Filters & Action Bar -->
+      <!-- Filters & Action Bar (Corporate Export Buttons) -->
       <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
         <div class="flex-1 flex gap-2">
           <div class="relative flex-1">
@@ -143,10 +145,16 @@
           </select>
         </div>
 
-        <button onclick="exportAllCSV()" class="px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
-          <i class="fa-solid fa-file-excel text-emerald-600"></i>
-          <span>Unduh CSV</span>
-        </button>
+        <div class="flex items-center gap-1.5">
+          <button onclick="exportCorporateExcel()" title="Download Excel Berformat Resmi" class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-xs">
+            <i class="fa-solid fa-file-excel text-emerald-200"></i>
+            <span>Export Excel (.xlsx)</span>
+          </button>
+          <button onclick="exportCorporateCSV()" title="Download CSV UTF-8" class="flex-1 sm:flex-none px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-bold flex items-center justify-center gap-1 transition active:scale-95 shadow-2xs">
+            <i class="fa-solid fa-file-csv text-slate-500"></i>
+            <span>CSV</span>
+          </button>
+        </div>
       </div>
 
       <!-- List Cards / Table -->
@@ -559,6 +567,7 @@
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- TOMBOL AKSI MODAL -->
@@ -936,7 +945,6 @@
       if (type === 'return' && returnSigPad) returnSigPad.clear();
     }
 
-    // Helper Konversi Base64 ke Blob Biner Murni (Stabil di iOS & Android)
     function dataURLtoBlob(dataurl) {
       const arr = dataurl.split(',');
       const mime = arr[0].match(/:(.*?);/)[1];
@@ -949,7 +957,7 @@
       return new Blob([u8arr], { type: mime });
     }
 
-    // 4. STORAGE SUPABASE UPLOADER (DENGAN PENANGANAN ERROR & FALLBACK ROBUST)
+    // 4. STORAGE SUPABASE UPLOADER
     async function uploadToSupabaseStorage(base64Data, filename) {
       if (!supabaseClient || !base64Data || !base64Data.startsWith('data:image')) {
         return base64Data;
@@ -1128,7 +1136,6 @@
       document.getElementById('returnModal').classList.add('hidden');
     }
 
-    // PERBAIKAN PENTING: PROSES PENGEMBALIAN FOTO DAN DATA TERSINKRON AKURAT
     async function handleReturnSubmit(e) {
       e.preventDefault();
       const loanId = document.getElementById('returnLoanId').value;
@@ -1148,7 +1155,6 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah Foto & Menyimpan...`;
 
       try {
-        // Upload foto pengembalian ke Supabase Storage (atau fallback DataURL)
         const photoUrl = await uploadToSupabaseStorage(photoData, `after_${loanId}`);
 
         const updateData = {
@@ -1177,7 +1183,6 @@
           }
         }
 
-        // Sinkronisasi Instan ke Array Lokal & Cache Browser
         if (loan) {
           Object.assign(loan, updateData);
           const tool = tools.find(t => t.id === loan.tool_id);
@@ -1191,8 +1196,6 @@
         closeReturnModal();
         alert("Pengembalian alat telah diverifikasi & foto fisik berhasil tersimpan!");
         renderAll();
-
-        // Buka langsung Berita Acara untuk verifikasi visual foto sebelum vs sesudah
         openDetailModal(loanId);
       } catch (err) {
         alert("Gagal memproses pengembalian: " + err.message);
@@ -1363,7 +1366,7 @@
       }
     }
 
-    // 8. RENDER LOGIC (FOTO SEBELUM DAN SESUDAH DITAMPILKAN SECARA ROBUST)
+    // 8. RENDER LOGIC
     function renderAll() {
       renderStats();
       renderLoans();
@@ -1457,7 +1460,7 @@
         `;
         tbody.appendChild(tr);
 
-        // Mobile Card View (Foto Sebelum & Sesudah Tampil Berdampingan dengan Jelas)
+        // Mobile Card View
         const card = document.createElement('div');
         card.className = "bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2";
         card.innerHTML = `
@@ -1478,7 +1481,6 @@
             }
           </div>
 
-          <!-- Dual Micro Photo Comparison (Sebelum vs Pengembalian) -->
           <div class="grid grid-cols-2 gap-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
             <div>
               <span class="text-[9px] text-slate-500 font-bold block mb-0.5">Foto Sebelum:</span>
@@ -1630,7 +1632,7 @@
       if (!loan) return;
       currentDetailLoan = loan;
 
-      document.getElementById('docLoanId').textContent = `NO. REGISTRASI: ${loan.id}`;
+      document.getElementById('docLoanId').textContent = `NO. REG: ${loan.id}`;
       document.getElementById('docToolName').textContent = loan.tool_name;
       document.getElementById('docBorrowerName').textContent = loan.borrower_name;
       document.getElementById('docOfficerBorrow').textContent = loan.officer_borrow || '-';
@@ -1715,38 +1717,128 @@
       }
     }
 
-    function exportAllCSV() {
+    // ========================================================
+    // 11. EXPORT EXCEL (.XLSX) & CSV CORPORATE MODERN
+    // ========================================================
+    function exportCorporateExcel() {
+      if (loans.length === 0) return alert("Belum ada data transaksi untuk diekspor.");
+
+      const now = new Date();
+      const printDate = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      // 1. Data Struktur dengan Header Corporate
+      const wsData = [
+        ["LAPORAN AUDIT & MUTASI SIRKULASI INVENTARIS ALAT KERJA"],
+        ["Sistem ToolTrack Enterprise - Manajemen Aset Operasional"],
+        [`Tanggal Unduh / Ekstraksi: ${printDate}`],
+        [`Total Mutasi: ${loans.length} Transaksi | Aktif Dipinjam: ${loans.filter(l=>l.status==='DIPINJAM').length} | Selesai: ${loans.filter(l=>l.status==='KEMBALI').length}`],
+        [], // Baris kosong pemisah
+        [
+          "NO",
+          "ID TRANSAKSI",
+          "NAMA ALAT KERJA",
+          "PEMINJAM",
+          "NO. WHATSAPP",
+          "PETUGAS PENYERAH",
+          "WAKTU PINJAM",
+          "STATUS MUTASI",
+          "PETUGAS PENERIMA",
+          "WAKTU PENGEMBALIAN",
+          "KONDISI PENGEMBALIAN",
+          "CATATAN / KEPERLUAN"
+        ]
+      ];
+
+      loans.forEach((l, idx) => {
+        wsData.push([
+          idx + 1,
+          l.id,
+          l.tool_name,
+          l.borrower_name,
+          l.borrower_phone ? `'${l.borrower_phone}` : "-",
+          l.officer_borrow || "-",
+          formatDateTime(l.borrow_date),
+          l.status,
+          l.officer_return || "-",
+          l.return_date ? formatDateTime(l.return_date) : "-",
+          l.condition_return || "-",
+          l.notes_borrow || "-"
+        ]);
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+      // Lebar Kolom Otomatis yang Rapi & Proporsional
+      ws['!cols'] = [
+        { wch: 5 },  // No
+        { wch: 15 }, // ID
+        { wch: 30 }, // Alat
+        { wch: 22 }, // Peminjam
+        { wch: 18 }, // WA
+        { wch: 20 }, // Petugas Pinjam
+        { wch: 20 }, // Waktu Pinjam
+        { wch: 15 }, // Status
+        { wch: 20 }, // Petugas Kembali
+        { wch: 20 }, // Waktu Kembali
+        { wch: 22 }, // Kondisi Kembali
+        { wch: 30 }  // Catatan
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, "Mutasi Alat");
+      XLSX.writeFile(wb, `Laporan_Mutasi_Alat_Corporate_${Date.now()}.xlsx`);
+    }
+
+    function exportCorporateCSV() {
       if (loans.length === 0) return alert("Belum ada data untuk diunduh.");
 
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "ID,Nama Alat,Peminjam,No WA,Petugas Pinjam,Tgl Pinjam,Status,Petugas Kembali,Tgl Kembali,Kondisi Kembali\n";
+      const now = new Date();
+      const printDate = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-      loans.forEach(l => {
+      // UTF-8 BOM (\uFEFF) agar Microsoft Excel langsung membaca aksen & font tanpa encoding error
+      let csvContent = "\uFEFF";
+      
+      // Header Metadata Corporate
+      csvContent += `"LAPORAN AUDIT & MUTASI SIRKULASI INVENTARIS ALAT KERJA"\n`;
+      csvContent += `"Sistem ToolTrack Enterprise - Manajemen Aset Operasional"\n`;
+      csvContent += `"Tanggal Ekstraksi: ${printDate}"\n`;
+      csvContent += `"Total: ${loans.length} | Dipinjam: ${loans.filter(l=>l.status==='DIPINJAM').length} | Selesai: ${loans.filter(l=>l.status==='KEMBALI').length}"\n\n`;
+
+      // Header Tabel Kolom
+      csvContent += `"NO","ID TRANSAKSI","NAMA ALAT KERJA","NAMA PEMINJAM","NO WHATSAPP","PETUGAS PENYERAH","WAKTU PINJAM","STATUS","PETUGAS PENERIMA","WAKTU KEMBALI","KONDISI KEMBALI","CATATAN"\n`;
+
+      loans.forEach((l, idx) => {
+        const clean = (val) => String(val || '-').replace(/"/g, '""');
+        const phone = l.borrower_phone ? `=""${l.borrower_phone}""` : `"-"`;
         const row = [
-          `"${l.id}"`,
-          `"${l.tool_name}"`,
-          `"${l.borrower_name}"`,
-          `"${l.borrower_phone}"`,
-          `"${l.officer_borrow || '-'}"`,
-          `"${l.borrow_date}"`,
-          `"${l.status}"`,
-          `"${l.officer_return || '-'}"`,
-          `"${l.return_date || '-'}"`,
-          `"${l.condition_return || '-'}"`
+          idx + 1,
+          `"${clean(l.id)}"`,
+          `"${clean(l.tool_name)}"`,
+          `"${clean(l.borrower_name)}"`,
+          phone,
+          `"${clean(l.officer_borrow)}"`,
+          `"${clean(formatDateTime(l.borrow_date))}"`,
+          `"${clean(l.status)}"`,
+          `"${clean(l.officer_return)}"`,
+          `"${clean(l.return_date ? formatDateTime(l.return_date) : '-')}"`,
+          `"${clean(l.condition_return)}"`,
+          `"${clean(l.notes_borrow)}"`
         ];
         csvContent += row.join(",") + "\n";
       });
 
-      const encodedUri = encodeURI(csvContent);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Mutasi_Sirkulasi_Alat_${Date.now()}.csv`);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Laporan_Mutasi_Alat_Corporate_${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
 
-    // 11. TABS & UTILITIES
+    // 12. TABS & UTILITIES
     function switchTab(tabId) {
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
