@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-100">
+<html lang="id" class="h-full bg-slate-50">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-  <title>Sistem Sirkulasi & Inventaris Alat Kerja</title>
-  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, berita acara digital PDF, dan WhatsApp dengan foto." />
+  <title>Sistem Manajemen & Peminjaman Alat Kerja | Enterprise Tool Management System</title>
+  <meta name="description" content="Aplikasi enterprise manajemen peminjaman dan pengembalian inventaris alat kerja berbasis cloud database, kompresi foto inspeksi ≤100KB, berita acara digital PDF, dan integrasi WhatsApp." />
   <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#064e3b" />
+  <meta name="theme-color" content="#0f172a" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Supabase JS Client -->
@@ -26,61 +26,75 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
-      font-size: 13px;
     }
     .sig-canvas {
       touch-action: none;
       cursor: crosshair;
     }
-    .mobile-safe-bottom {
-      padding-bottom: calc(7rem + env(safe-area-inset-bottom, 20px));
+    .pb-bottom-nav {
+      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 16px));
+    }
+    .bottom-nav-safe {
+      padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
     }
     ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
     }
     ::-webkit-scrollbar-thumb {
-      background: #a7f3d0;
+      background: #cbd5e1;
       border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
   </style>
 </head>
-<body class="min-h-full flex flex-col bg-slate-100 text-slate-800 antialiased">
+<body class="min-h-full flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-slate-900 selection:text-white">
 
   <!-- ========================================================
-       TOP HEADER (Emerald Theme)
+       TOP HEADER
   ======================================================== -->
-  <header class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white sticky top-0 z-40 shadow-sm border-b border-emerald-700/40">
-    <div class="max-w-5xl mx-auto px-3.5 py-2.5 sm:px-6 flex items-center justify-between">
-      <div class="flex items-center space-x-2.5">
-        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shadow-inner">
-          <i class="fa-solid fa-shield-halved text-sm"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <span class="font-extrabold text-xs tracking-tight text-white uppercase">ToolTrack Binayasa</span>
-            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v2.6</span>
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Brand Identity -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-inner font-bold text-lg tracking-wider">
+            <i class="fa-solid fa-layer-group"></i>
           </div>
-          <p class="text-[10px] text-emerald-200/90 font-medium">Sirkulasi & Inspeksi Alat Kerja</p>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-base tracking-tight text-white uppercase">ToolTrack</span>
+              <span class="text-[10px] uppercase font-semibold px-2 py-0.5 rounded bg-blue-900/60 text-blue-300 border border-blue-700/50 tracking-wider">Enterprise</span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium hidden sm:block">Asset Circulation & Inspection Management</p>
+          </div>
         </div>
-      </div>
 
-      <button onclick="refreshData()" title="Sinkronkan Data" class="px-2.5 py-1 rounded-lg bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 border border-emerald-600/60 transition text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs active:scale-95">
-        <i class="fa-solid fa-rotate text-emerald-300 text-xs"></i>
-        <span>Sinkron</span>
-      </button>
+        <!-- Tombol Sinkronisasi Cepat -->
+        <button onclick="refreshData()" title="Sinkronkan Data" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/80 transition text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-arrows-rotate text-blue-400"></i>
+          <span>Sinkron</span>
+        </button>
+
+      </div>
     </div>
 
-    <!-- Desktop Tabs -->
-    <nav class="hidden md:flex border-t border-emerald-700/50 bg-emerald-950/70 px-6 max-w-5xl mx-auto">
-      <button onclick="switchTab('dashboard')" class="tab-btn active-tab px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-emerald-400 text-emerald-300 flex items-center gap-1.5 transition" data-tab="dashboard">
-        <i class="fa-solid fa-chart-pie"></i> Mutasi & Beranda
+    <!-- Desktop Navigation Tabs -->
+    <nav aria-label="Main Navigation" class="hidden md:flex border-t border-slate-800 bg-slate-900/90 backdrop-blur px-6 max-w-7xl mx-auto">
+      <button onclick="switchTab('dashboard')" class="tab-btn active-tab px-4 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 border-blue-500 text-blue-400 flex items-center gap-2 transition" data-tab="dashboard">
+        <i class="fa-solid fa-chart-line"></i> Dashboard & Audit Log
       </button>
-      <button onclick="switchTab('borrow')" class="tab-btn px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-transparent text-emerald-200/70 hover:text-white flex items-center gap-1.5 transition" data-tab="borrow">
-        <i class="fa-solid fa-hand-holding-hand"></i> Pinjam Baru
+      <button onclick="switchTab('borrow')" class="tab-btn px-4 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition" data-tab="borrow">
+        <i class="fa-solid fa-arrow-right-arrow-left"></i> Registrasi Peminjaman
       </button>
-      <button onclick="switchTab('tools')" class="tab-btn px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-transparent text-emerald-200/70 hover:text-white flex items-center gap-1.5 transition" data-tab="tools">
-        <i class="fa-solid fa-cubes"></i> Katalog Inventaris
+      <button onclick="switchTab('tools')" class="tab-btn px-4 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition" data-tab="tools">
+        <i class="fa-solid fa-boxes-stacked"></i> Master Katalog Alat
       </button>
     </nav>
   </header>
@@ -88,257 +102,279 @@
   <!-- ========================================================
        MAIN APP WORKSPACE
   ======================================================== -->
-  <main class="max-w-5xl mx-auto px-3 sm:px-6 py-3 flex-1 w-full mobile-safe-bottom">
+  <main class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full pb-bottom-nav">
 
     <!-- ==========================================
-         TAB 1: BERANDA / DASHBOARD MUTASI
+         TAB 1: DASHBOARD & DAFTAR TRANSAKSI
     ========================================== -->
-    <section id="tab-dashboard" class="space-y-3">
-      <!-- Wallet Card Summary -->
-      <div class="bg-gradient-to-br from-emerald-800 via-teal-800 to-emerald-900 text-white rounded-2xl p-4 shadow-md border border-emerald-700 relative overflow-hidden">
-        <div class="absolute -right-6 -bottom-6 opacity-10 text-white text-8xl pointer-events-none">
-          <i class="fa-solid fa-wallet"></i>
-        </div>
-
-        <div class="flex items-center justify-between pb-3 border-b border-emerald-700/60">
+    <section id="tab-dashboard" class="space-y-4 sm:space-y-6">
+      
+      <!-- Metric Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span class="text-[10px] text-emerald-300 uppercase tracking-wider font-semibold block">Total Sirkulasi Transaksi</span>
-            <div id="statTotalLoans" class="text-2xl font-black text-white tracking-tight">0</div>
+            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Master Alat</span>
+            <span id="statTotalTools" class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">0</span>
           </div>
-          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Cloud Terhubung
-          </span>
+          <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-base">
+            <i class="fa-solid fa-toolbox"></i>
+          </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-2 pt-3 text-center">
-          <div class="bg-emerald-950/40 rounded-xl p-2 border border-emerald-600/30">
-            <span class="text-[9px] text-emerald-300 font-medium uppercase block">Total Alat</span>
-            <span id="statTotalTools" class="text-base font-bold text-white">0</span>
+        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-amber-200/90 shadow-sm flex items-center justify-between bg-gradient-to-br from-white to-amber-50/30">
+          <div>
+            <span class="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">Aktif Dipinjam</span>
+            <span id="statBorrowed" class="text-xl sm:text-2xl font-bold text-amber-600 tracking-tight">0</span>
           </div>
-          <div class="bg-amber-950/40 rounded-xl p-2 border border-amber-500/30">
-            <span class="text-[9px] text-amber-300 font-medium uppercase block">Dipinjam</span>
-            <span id="statBorrowed" class="text-base font-bold text-amber-300">0</span>
+          <div class="w-10 h-10 rounded-lg bg-amber-100/70 text-amber-700 flex items-center justify-center text-base">
+            <i class="fa-solid fa-handshake"></i>
           </div>
-          <div class="bg-emerald-950/40 rounded-xl p-2 border border-emerald-500/30">
-            <span class="text-[9px] text-emerald-300 font-medium uppercase block">Selesai</span>
-            <span id="statReturned" class="text-base font-bold text-emerald-300">0</span>
+        </div>
+
+        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-emerald-200/90 shadow-sm flex items-center justify-between bg-gradient-to-br from-white to-emerald-50/30">
+          <div>
+            <span class="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider block">Telah Kembali</span>
+            <span id="statReturned" class="text-xl sm:text-2xl font-bold text-emerald-600 tracking-tight">0</span>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center text-base">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Sirkulasi</span>
+            <span id="statTotalLoans" class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">0</span>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center text-base">
+            <i class="fa-solid fa-file-shield"></i>
           </div>
         </div>
       </div>
 
-      <!-- Filters & Action Bar -->
-      <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
-        <div class="flex-1 flex gap-2">
+      <!-- Filters & Actions Utility Bar -->
+      <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-2.5 items-stretch md:items-center justify-between">
+        <div class="flex-1 flex flex-col sm:flex-row gap-2">
           <div class="relative flex-1">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-            <input type="text" id="searchInput" placeholder="Cari peminjam, alat, nomor WA..." oninput="renderLoans()" class="w-full pl-8 pr-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-medium focus:bg-white focus:outline-none focus:border-emerald-600 transition" />
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="searchInput" placeholder="Cari nama peminjam, nama alat, ID..." oninput="renderLoans()" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition" />
           </div>
-          <select id="filterStatus" onchange="renderLoans()" class="bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold px-2 py-1.5 text-slate-700 focus:bg-white focus:outline-none">
-            <option value="ALL">Semua</option>
-            <option value="DIPINJAM">Dipinjam</option>
-            <option value="KEMBALI">Kembali</option>
+          <select id="filterStatus" onchange="renderLoans()" class="bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-medium px-3 py-2 text-slate-700 focus:bg-white focus:outline-none focus:border-slate-800">
+            <option value="ALL">Semua Status Peminjaman</option>
+            <option value="DIPINJAM">Hanya Sedang Dipinjam</option>
+            <option value="KEMBALI">Hanya Sudah Selesai / Kembali</option>
           </select>
         </div>
 
-        <button onclick="exportAllCSV()" class="px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
-          <i class="fa-solid fa-file-excel text-emerald-600"></i>
-          <span>Unduh CSV</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="exportAllCSV()" class="w-full sm:w-auto px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
+            <i class="fa-solid fa-file-csv text-emerald-600"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
-      <!-- List Cards / Table -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between px-1">
-          <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-clock-rotate-left text-emerald-600 text-xs"></i>
-            Riwayat Mutasi Sirkulasi
-          </span>
-          <span id="loanCountBadge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">0 Data</span>
+      <!-- Main Audit Table / Mobile Cards Feed -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+        <div class="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-clock-rotate-left text-slate-700 text-sm"></i>
+            <h2 class="font-bold text-slate-900 text-sm tracking-tight">Audit Log Sirkulasi Peminjaman</h2>
+          </div>
+          <span id="loanCountBadge" class="text-[11px] bg-slate-200/80 text-slate-700 font-semibold px-2.5 py-0.5 rounded-full">0 Data</span>
         </div>
 
-        <!-- Desktop Table -->
-        <div class="hidden lg:block bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
-          <table class="w-full text-left text-[11px] border-collapse">
-            <thead class="bg-slate-50 text-slate-600 uppercase font-bold border-b border-slate-200">
+        <!-- DESKTOP TABLE VIEW -->
+        <div class="hidden lg:block overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-100/75 text-slate-600 uppercase font-bold tracking-wider border-b border-slate-200">
               <tr>
-                <th class="py-2.5 px-3">Alat & ID</th>
-                <th class="py-2.5 px-3">Peminjam</th>
-                <th class="py-2.5 px-3">Tgl Pinjam</th>
-                <th class="py-2.5 px-3 text-center">Foto Awal</th>
-                <th class="py-2.5 px-3">Tgl Kembali</th>
-                <th class="py-2.5 px-3 text-center">Foto Akhir</th>
-                <th class="py-2.5 px-3 text-center">Status</th>
-                <th class="py-2.5 px-3 text-right">Aksi</th>
+                <th class="py-3 px-4">Info Alat & ID</th>
+                <th class="py-3 px-4">Peminjam & WhatsApp</th>
+                <th class="py-3 px-4">Waktu Peminjaman</th>
+                <th class="py-3 px-4 text-center">Foto Awal</th>
+                <th class="py-3 px-4">Waktu Pengembalian</th>
+                <th class="py-3 px-4 text-center">Foto Akhir</th>
+                <th class="py-3 px-4 text-center">Status</th>
+                <th class="py-3 px-4 text-right">Opsi / Aksi</th>
               </tr>
             </thead>
-            <tbody id="loanTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+            <tbody id="loanTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+              <!-- Populated via Javascript -->
+            </tbody>
           </table>
         </div>
 
-        <!-- Mobile Card Feed -->
-        <div id="loanCardContainer" class="lg:hidden space-y-2.5"></div>
+        <!-- MOBILE & TABLET CARD FEED -->
+        <div id="loanCardContainer" class="lg:hidden p-3 space-y-3 bg-slate-100/50 pb-6">
+          <!-- Populated via Javascript -->
+        </div>
 
         <!-- Empty State -->
-        <div id="noDataPlaceholder" class="hidden bg-white rounded-xl border border-dashed border-slate-300 py-10 text-center">
-          <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto text-base mb-2">
+        <div id="noDataPlaceholder" class="hidden py-12 text-center">
+          <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-xl mb-2.5">
             <i class="fa-solid fa-folder-open"></i>
           </div>
-          <p class="font-bold text-slate-700 text-xs">Belum Ada Transaksi</p>
-          <p class="text-[10px] text-slate-400 mt-0.5">Daftarkan peminjaman melalui menu "Pinjam" di bawah.</p>
+          <p class="font-bold text-slate-700 text-sm">Belum Ada Catatan Transaksi</p>
+          <p class="text-xs text-slate-400 mt-0.5">Daftarkan peminjaman pertama Anda pada formulir registrasi.</p>
         </div>
       </div>
     </section>
 
     <!-- ==========================================
-         TAB 2: REGISTRASI PINJAM ALAT BARU
+         TAB 2: FORM REGISTRASI PINJAM ALAT
     ========================================== -->
-    <section id="tab-borrow" class="hidden max-w-xl mx-auto space-y-3">
-      <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
-        <div class="border-b border-slate-100 pb-2.5 flex items-center justify-between">
+    <section id="tab-borrow" class="hidden max-w-2xl mx-auto space-y-4 sm:space-y-6">
+      <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div class="border-b border-slate-100 pb-3.5 mb-4 flex items-center justify-between">
           <div>
-            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-arrow-up-from-bracket text-emerald-600"></i>
-              Formulir Peminjaman Alat
+            <h2 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <i class="fa-solid fa-file-circle-plus text-blue-600"></i>
+              Formulir Peminjaman Alat Kerja
             </h2>
-            <p class="text-[10px] text-slate-500">Pencatatan penyerahan aset kerja operasional</p>
+            <p class="text-xs text-slate-500 mt-0.5">Dokumentasi resmi sirkulasi aset sebelum penyerahan.</p>
           </div>
-          <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Keluaran Aset</span>
+          <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">Tahap 1</span>
         </div>
 
-        <form id="borrowForm" onsubmit="handleBorrowSubmit(event)" class="space-y-3 text-xs">
+        <form id="borrowForm" onsubmit="handleBorrowSubmit(event)" class="space-y-4">
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih Alat Inventaris <span class="text-red-500">*</span></label>
-            <select id="borrowToolSelect" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:border-emerald-600">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih Alat Inventaris <span class="text-red-500">*</span></label>
+            <select id="borrowToolSelect" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800">
               <option value="">-- Pilih Alat yang Tersedia --</option>
             </select>
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Peminjam <span class="text-red-500">*</span></label>
-              <input type="text" id="borrowerName" required placeholder="Nama lengkap" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600" />
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Peminjam <span class="text-red-500">*</span></label>
+              <input type="text" id="borrowerName" required placeholder="Contoh: Budi Santoso" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Nomor WhatsApp <span class="text-red-500">*</span></label>
-              <input type="tel" id="borrowerPhone" required placeholder="08xxxxxxxxxx" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium font-mono focus:bg-white focus:outline-none focus:border-emerald-600" />
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nomor WhatsApp <span class="text-red-500">*</span></label>
+              <input type="tel" id="borrowerPhone" required placeholder="Contoh: 08123456789" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800" />
             </div>
           </div>
 
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Waktu Pinjam <span class="text-red-500">*</span></label>
-            <input type="datetime-local" id="borrowDate" required class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600" />
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Waktu Peminjaman <span class="text-red-500">*</span></label>
+            <input type="datetime-local" id="borrowDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800" />
           </div>
 
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Keperluan / Keterangan</label>
-            <textarea id="borrowNotes" rows="2" placeholder="Catatan lokasi kerja atau perbaikan..." class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600"></textarea>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Keperluan / Catatan Pekerjaan</label>
+            <textarea id="borrowNotes" rows="2" placeholder="Tuliskan tujuan pemakaian atau nomor SPK..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800"></textarea>
           </div>
 
-          <!-- DOKUMENTASI FOTO SEBELUM -->
-          <div class="p-3 bg-emerald-50/40 rounded-xl border border-emerald-200/80 space-y-2">
+          <!-- FOTO SEBELUM DIPINJAM -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
             <div class="flex items-center justify-between">
-              <label class="text-[10px] font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1">
-                <i class="fa-solid fa-camera text-emerald-600"></i>
-                Foto Kondisi Sebelum Pinjam <span class="text-red-500">*</span>
+              <label class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-camera text-blue-600"></i>
+                Dokumentasi Fisik Sebelum Dipinjam <span class="text-red-500">*</span>
               </label>
-              <span id="borrowPhotoBadge" class="text-[9px] font-bold text-slate-500">Auto ≤ 100 KB</span>
+              <span id="borrowPhotoBadge" class="text-[10px] font-semibold text-slate-500">Auto ≤ 100 KB</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
-              <label class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-800 cursor-pointer font-bold text-[11px] shadow-2xs transition active:scale-95">
-                <i class="fa-solid fa-camera text-emerald-600"></i>
-                <span>Kamera HP</span>
+              <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-800 cursor-pointer font-bold text-xs shadow-2xs transition active:scale-95 text-center">
+                <i class="fa-solid fa-camera text-blue-600"></i>
+                <span>Kamera Langsung</span>
                 <input type="file" accept="image/*" capture="environment" class="hidden" onchange="processImage(this, 'borrow')" />
               </label>
 
-              <label class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 cursor-pointer font-bold text-[11px] shadow-2xs transition active:scale-95">
-                <i class="fa-regular fa-image text-slate-500"></i>
-                <span>Dari Galeri</span>
+              <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-800 cursor-pointer font-bold text-xs shadow-2xs transition active:scale-95 text-center">
+                <i class="fa-regular fa-image text-slate-600"></i>
+                <span>Pilih Galeri</span>
                 <input type="file" accept="image/*" class="hidden" onchange="processImage(this, 'borrow')" />
               </label>
             </div>
 
-            <div id="borrowCompressProgress" class="hidden py-1 text-center text-[10px] font-bold text-emerald-700 animate-pulse">
-              <i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengompresi ke target ≤ 100 KB...
+            <div id="borrowCompressProgress" class="hidden py-2 text-center text-xs font-medium text-blue-700 animate-pulse">
+              <i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengompresi resolusi foto ke target ≤ 100 KB...
             </div>
 
-            <div id="borrowPhotoPreviewContainer" class="hidden relative rounded-xl overflow-hidden border border-emerald-300 bg-slate-900 flex justify-center items-center max-h-48">
-              <img id="borrowPhotoPreview" src="" alt="Foto Sebelum" class="max-h-48 w-auto object-contain" />
-              <button type="button" onclick="removePhoto('borrow')" class="absolute top-1.5 right-1.5 bg-slate-900/80 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-[10px]">
+            <div id="borrowPhotoPreviewContainer" class="hidden relative rounded-lg overflow-hidden border border-slate-300 bg-slate-900 flex justify-center items-center max-h-52">
+              <img id="borrowPhotoPreview" src="" alt="Preview Foto Sebelum" class="max-h-52 w-auto object-contain" />
+              <button type="button" onclick="removePhoto('borrow')" aria-label="Hapus Foto" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
             <input type="hidden" id="borrowPhotoData" required />
           </div>
 
-          <!-- TTD DIGITAL -->
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+          <!-- DIGITAL SIGNATURE PAD -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
             <div class="flex items-center justify-between">
-              <label class="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                <i class="fa-solid fa-signature text-emerald-600"></i>
+              <label class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-signature text-blue-600"></i>
                 Tanda Tangan Peminjam <span class="text-red-500">*</span>
               </label>
-              <button type="button" onclick="clearSignature('borrow')" class="text-[10px] text-red-600 hover:text-red-700 font-bold">
-                <i class="fa-solid fa-eraser"></i> Bersihkan
+              <button type="button" onclick="clearSignature('borrow')" class="text-xs text-red-600 hover:text-red-700 font-semibold">
+                <i class="fa-solid fa-eraser"></i> Hapus
               </button>
             </div>
-            <div class="bg-white rounded-xl border border-slate-300 overflow-hidden">
-              <canvas id="borrowSigCanvas" width="400" height="120" class="sig-canvas w-full h-24 block bg-white"></canvas>
+            <div class="bg-white rounded-lg border border-slate-300 overflow-hidden">
+              <canvas id="borrowSigCanvas" width="400" height="130" class="sig-canvas w-full h-28 block bg-white"></canvas>
             </div>
-            <p class="text-[9px] text-slate-400">Goreskan jari tangan di layar HP.</p>
+            <p class="text-[11px] text-slate-400">Gunakan jari tangan di layar HP atau kursor mouse desktop.</p>
           </div>
 
-          <button type="submit" id="submitBorrowBtn" class="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.99] text-white font-bold rounded-xl text-xs tracking-wide shadow-md shadow-emerald-900/20 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-check-circle"></i>
-            <span>Simpan Peminjaman</span>
+          <button type="submit" id="submitBorrowBtn" class="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white font-bold rounded-lg text-xs sm:text-sm tracking-wide shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Simpan & Daftarkan Peminjaman</span>
           </button>
         </form>
       </div>
     </section>
 
     <!-- ==========================================
-         TAB 3: KATALOG MASTER ALAT
+         TAB 3: MASTER KATALOG INVENTARIS ALAT
     ========================================== -->
-    <section id="tab-tools" class="hidden space-y-3">
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+    <section id="tab-tools" class="hidden space-y-4 sm:space-y-6">
+      <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-100">
           <div>
-            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-boxes-stacked text-emerald-600"></i>
-              Katalog Master Inventaris
+            <h2 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <i class="fa-solid fa-toolbox text-blue-600"></i>
+              Katalog Master Inventaris Alat
             </h2>
-            <p class="text-[10px] text-slate-500">Status ketersediaan alat kerja operasional</p>
+            <p class="text-xs text-slate-500 mt-0.5">Daftar kesiapan alat operasional dan status sirkulasi.</p>
           </div>
-          <button onclick="openAddToolModal()" class="py-1.5 px-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-[11px] transition flex items-center gap-1 shadow-2xs">
-            <i class="fa-solid fa-plus text-[10px]"></i>
-            <span>Alat Baru</span>
+          <button onclick="openAddToolModal()" class="py-2 px-3.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-2xs">
+            <i class="fa-solid fa-plus"></i>
+            <span>Tambah Alat Baru</span>
           </button>
         </div>
-        <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
+
+        <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
+          <!-- Populated via Javascript -->
+        </div>
       </div>
     </section>
+
   </main>
 
   <!-- ========================================================
-       MOBILE FLOATING BOTTOM NAV DOCK
+       MOBILE BOTTOM NAVIGATION
   ======================================================== -->
-  <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-2 left-3 right-3 bg-white/90 backdrop-blur-lg border border-slate-200/90 rounded-2xl z-40 shadow-lg px-2 py-1.5">
-    <div class="grid grid-cols-3 items-center text-center">
-      <button onclick="switchTab('dashboard')" class="mobile-tab-btn flex flex-col items-center py-1 text-emerald-800 font-bold transition active:scale-95" data-tab="dashboard">
-        <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
-        <span class="text-[9px] uppercase tracking-wider">Mutasi</span>
+  <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 shadow-lg px-3 pt-2 bottom-nav-safe">
+    <div class="grid grid-cols-3 items-center">
+      <button onclick="switchTab('dashboard')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-900 font-bold" data-tab="dashboard">
+        <i class="fa-solid fa-chart-line text-lg"></i>
+        <span class="text-[10px] mt-1 tracking-tight">Audit Log</span>
       </button>
 
-      <button onclick="switchTab('borrow')" class="mobile-tab-btn flex flex-col items-center py-0.5 text-slate-400 hover:text-emerald-700 transition active:scale-95" data-tab="borrow">
-        <div class="w-10 h-10 -mt-5 rounded-2xl bg-gradient-to-tr from-emerald-700 to-teal-600 text-white flex items-center justify-center shadow-md border-2 border-white">
-          <i class="fa-solid fa-plus text-sm"></i>
+      <button onclick="switchTab('borrow')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-400 hover:text-slate-800 font-semibold" data-tab="borrow">
+        <div class="w-10 h-10 -mt-5 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-md border-2 border-white">
+          <i class="fa-solid fa-plus text-base"></i>
         </div>
-        <span class="text-[9px] uppercase font-bold tracking-wider mt-0.5">Pinjam</span>
+        <span class="text-[10px] mt-0.5 tracking-tight">Pinjam</span>
       </button>
 
-      <button onclick="switchTab('tools')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-400 hover:text-emerald-800 transition active:scale-95" data-tab="tools">
-        <i class="fa-solid fa-toolbox text-base mb-0.5"></i>
-        <span class="text-[9px] uppercase tracking-wider">Katalog</span>
+      <button onclick="switchTab('tools')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-400 hover:text-slate-800 font-semibold" data-tab="tools">
+        <i class="fa-solid fa-toolbox text-lg"></i>
+        <span class="text-[10px] mt-1 tracking-tight">Katalog</span>
       </button>
     </div>
   </nav>
@@ -347,311 +383,333 @@
        MODAL 1: PROSES PENGEMBALIAN ALAT
   ======================================================== -->
   <div id="returnModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+    <div class="bg-white rounded-t-2xl sm:rounded-2xl max-w-xl w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold">
-            <i class="fa-solid fa-arrow-down-to-bracket"></i>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-rotate-left"></i>
           </div>
           <div>
-            <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Penerimaan Pengembalian</h3>
-            <p id="returnToolTitle" class="text-[10px] text-slate-500 font-medium"></p>
+            <h3 class="font-bold text-slate-900 text-sm">Verifikasi Pengembalian Alat</h3>
+            <p id="returnToolTitle" class="text-xs text-slate-500 font-medium"></p>
           </div>
         </div>
-        <button onclick="closeReturnModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeReturnModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg text-base">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
-      <form id="returnForm" onsubmit="handleReturnSubmit(event)" class="space-y-3 text-xs">
+      <form id="returnForm" onsubmit="handleReturnSubmit(event)" class="space-y-3.5">
         <input type="hidden" id="returnLoanId" />
-        <div class="grid grid-cols-2 gap-2">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Waktu Kembali *</label>
-            <input type="datetime-local" id="returnDate" required class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600" />
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Waktu Kembali <span class="text-red-500">*</span></label>
+            <input type="datetime-local" id="returnDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:bg-white focus:outline-none focus:border-slate-800" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Kondisi Akhir *</label>
-            <select id="returnCondition" required class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Kondisi Fisik Akhir <span class="text-red-500">*</span></label>
+            <select id="returnCondition" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:bg-white focus:outline-none focus:border-slate-800">
               <option value="Baik & Lengkap">Baik & Lengkap</option>
-              <option value="Kotor / Perlu Dicuci">Kotor / Perlu Dicuci</option>
+              <option value="Kotor / Perlu Dibersihkan">Kotor / Perlu Dibersihkan</option>
               <option value="Rusak Ringan">Rusak Ringan</option>
               <option value="Rusak Berat">Rusak Berat</option>
+              <option value="Ada Komponen Hilang">Ada Komponen Hilang</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Catatan Pengembalian</label>
-          <textarea id="returnNotes" rows="2" placeholder="Kondisi baterai, part yang kembali..." class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none"></textarea>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Catatan Pengembalian</label>
+          <textarea id="returnNotes" rows="2" placeholder="Kelengkapan part, baterai, kendala pemakaian..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:bg-white focus:outline-none focus:border-slate-800"></textarea>
         </div>
 
         <!-- FOTO SAAT KEMBALI -->
-        <div class="p-2.5 bg-emerald-50/40 rounded-xl border border-emerald-200/80 space-y-2">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
           <div class="flex items-center justify-between">
-            <label class="text-[10px] font-bold text-emerald-900 uppercase flex items-center gap-1">
+            <label class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-camera text-emerald-600"></i>
-              Foto Kondisi Saat Kembali *
+              Foto Kondisi Saat Kembali <span class="text-red-500">*</span>
             </label>
-            <span id="returnPhotoBadge" class="text-[9px] font-bold text-slate-500">Auto ≤ 100 KB</span>
+            <span id="returnPhotoBadge" class="text-[10px] font-semibold text-slate-500">Auto ≤ 100 KB</span>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
-            <label class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-800 cursor-pointer font-bold text-[11px] shadow-2xs transition active:scale-95">
+            <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-800 cursor-pointer font-bold text-xs shadow-2xs transition active:scale-95 text-center">
               <i class="fa-solid fa-camera text-emerald-600"></i>
               <span>Kamera HP</span>
               <input type="file" accept="image/*" capture="environment" class="hidden" onchange="processImage(this, 'return')" />
             </label>
 
-            <label class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 cursor-pointer font-bold text-[11px] shadow-2xs transition active:scale-95">
-              <i class="fa-regular fa-image text-slate-500"></i>
+            <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-800 cursor-pointer font-bold text-xs shadow-2xs transition active:scale-95 text-center">
+              <i class="fa-regular fa-image text-slate-600"></i>
               <span>Dari Galeri</span>
               <input type="file" accept="image/*" class="hidden" onchange="processImage(this, 'return')" />
             </label>
           </div>
 
-          <div id="returnCompressProgress" class="hidden py-1 text-center text-[10px] font-bold text-emerald-700 animate-pulse">
+          <div id="returnCompressProgress" class="hidden py-1.5 text-center text-xs font-medium text-emerald-700 animate-pulse">
             <i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengompresi foto ke ≤ 100 KB...
           </div>
 
-          <div id="returnPhotoPreviewContainer" class="hidden relative rounded-xl overflow-hidden border border-emerald-300 bg-slate-900 flex justify-center items-center max-h-40">
-            <img id="returnPhotoPreview" src="" alt="Foto Sesudah" class="max-h-40 w-auto object-contain" />
-            <button type="button" onclick="removePhoto('return')" class="absolute top-1.5 right-1.5 bg-slate-900/80 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-[10px]">
+          <div id="returnPhotoPreviewContainer" class="hidden relative rounded-lg overflow-hidden border border-slate-300 bg-slate-900 flex justify-center items-center max-h-44">
+            <img id="returnPhotoPreview" src="" alt="Preview Foto Sesudah" class="max-h-44 w-auto object-contain" />
+            <button type="button" onclick="removePhoto('return')" aria-label="Hapus Foto" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
           <input type="hidden" id="returnPhotoData" required />
         </div>
 
-        <!-- TTD PETUGAS -->
-        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+        <!-- TTD PENGEMBALIAN -->
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
           <div class="flex items-center justify-between">
-            <label class="text-[10px] font-bold text-slate-800 uppercase flex items-center gap-1">
+            <label class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-signature text-emerald-600"></i>
-              Tanda Tangan Penerima / Petugas *
+              Tanda Tangan Petugas / Penerima <span class="text-red-500">*</span>
             </label>
-            <button type="button" onclick="clearSignature('return')" class="text-[10px] text-red-600 font-bold">Bersihkan</button>
+            <button type="button" onclick="clearSignature('return')" class="text-xs text-red-600 hover:text-red-700 font-semibold">
+              <i class="fa-solid fa-eraser"></i> Hapus
+            </button>
           </div>
-          <div class="bg-white rounded-xl border border-slate-300 overflow-hidden">
-            <canvas id="returnSigCanvas" width="400" height="110" class="sig-canvas w-full h-20 block bg-white"></canvas>
+          <div class="bg-white rounded-lg border border-slate-300 overflow-hidden">
+            <canvas id="returnSigCanvas" width="400" height="120" class="sig-canvas w-full h-24 block bg-white"></canvas>
           </div>
         </div>
 
-        <button type="submit" id="submitReturnBtn" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-md transition">
-          <i class="fa-solid fa-check mr-1"></i> Konfirmasi Selesai
+        <button type="submit" id="submitReturnBtn" class="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.99] text-white font-bold rounded-lg text-xs tracking-wide shadow-md transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-check"></i>
+          <span>Konfirmasi Selesai Pengembalian</span>
         </button>
       </form>
     </div>
   </div>
 
   <!-- ========================================================
-       MODAL 2: DOKUMEN RESMI & PDF
+       MODAL 2: DOKUMEN BERITA ACARA RESMI & EKSPOR PDF
   ======================================================== -->
   <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-        <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-file-invoice text-emerald-600"></i>
-          Berita Acara Digital
+    <div class="bg-white rounded-t-2xl sm:rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-file-shield text-blue-600"></i>
+          Berita Acara Sirkulasi Aset Digital
         </h3>
-        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 p-1 text-base">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
-      <div id="pdfContentArea" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-3 text-[11px]">
-        <div class="border-b border-slate-200 pb-2 flex items-start justify-between">
+      <!-- Printable Area for PDF Generation -->
+      <div id="pdfContentArea" class="bg-white p-4 sm:p-6 rounded-xl border border-slate-300 text-slate-800 space-y-4 text-xs">
+        <div class="border-b border-slate-200 pb-3 flex items-start justify-between">
           <div>
-            <h4 class="font-black text-xs uppercase text-slate-900 tracking-tight">BERITA ACARA PINJAM PAKAI ALAT</h4>
-            <p class="text-[9px] font-mono text-slate-500 font-semibold" id="docLoanId"></p>
+            <h4 class="font-black text-sm uppercase text-slate-900 tracking-tight">BERITA ACARA PINJAM PAKAI ALAT KERJA</h4>
+            <p class="text-[11px] font-mono text-slate-500 font-semibold" id="docLoanId"></p>
           </div>
-          <span id="docStatusBadge" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase"></span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-1.5">
-          <div class="p-1.5 rounded bg-slate-50 border border-slate-100">
-            <span class="text-[9px] text-slate-400 uppercase font-bold block">Alat Kerja</span>
-            <span id="docToolName" class="font-bold text-slate-800 text-[11px]"></span>
-          </div>
-          <div class="p-1.5 rounded bg-slate-50 border border-slate-100">
-            <span class="text-[9px] text-slate-400 uppercase font-bold block">Peminjam</span>
-            <span id="docBorrowerName" class="font-bold text-slate-800 text-[11px]"></span>
-          </div>
-          <div class="p-1.5 rounded bg-slate-50 border border-slate-100">
-            <span class="text-[9px] text-slate-400 uppercase font-bold block">WhatsApp</span>
-            <span id="docBorrowerPhone" class="font-semibold text-slate-700 font-mono"></span>
-          </div>
-          <div class="p-1.5 rounded bg-slate-50 border border-slate-100">
-            <span class="text-[9px] text-slate-400 uppercase font-bold block">Tgl Pinjam</span>
-            <span id="docBorrowDate" class="font-semibold text-slate-700"></span>
-          </div>
-          <div class="p-1.5 rounded bg-slate-50 border border-slate-100">
-            <span class="text-[9px] text-slate-400 uppercase font-bold block">Tgl Kembali</span>
-            <span id="docReturnDate" class="font-semibold text-slate-700">-</span>
-          </div>
-          <div class="p-1.5 rounded bg-slate-50 border border-slate-100">
-            <span class="text-[9px] text-slate-400 uppercase font-bold block">Kondisi Akhir</span>
-            <span id="docConditionReturn" class="font-semibold text-slate-700">-</span>
+          <div>
+            <span id="docStatusBadge" class="text-[10px] px-2.5 py-0.5 rounded font-bold uppercase tracking-wider"></span>
           </div>
         </div>
 
-        <div>
-          <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">Dokumentasi Fisik</span>
-          <div class="grid grid-cols-2 gap-1.5">
-            <div class="border border-slate-200 rounded-lg p-1 text-center bg-slate-50">
-              <span class="text-[9px] font-bold text-slate-500 block mb-0.5">Sebelum Pinjam</span>
-              <div class="h-28 flex items-center justify-center bg-slate-200 rounded overflow-hidden">
-                <img id="docPhotoBefore" src="" alt="Sebelum" class="h-full w-full object-cover" />
-              </div>
-            </div>
-            <div class="border border-slate-200 rounded-lg p-1 text-center bg-slate-50">
-              <span class="text-[9px] font-bold text-slate-500 block mb-0.5">Saat Kembali</span>
-              <div class="h-28 flex items-center justify-center bg-slate-200 rounded overflow-hidden">
-                <img id="docPhotoAfter" src="" alt="Sesudah" class="h-full w-full object-cover" />
-                <span id="docPhotoAfterEmpty" class="text-[10px] text-slate-400 hidden">Belum Kembali</span>
-              </div>
-            </div>
+        <div class="grid grid-cols-2 gap-2.5 py-1">
+          <div class="p-2 rounded bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-500 uppercase font-bold block">Nama Alat Kerja</span>
+            <span id="docToolName" class="font-bold text-slate-900 text-xs"></span>
+          </div>
+          <div class="p-2 rounded bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-500 uppercase font-bold block">Peminjam</span>
+            <span id="docBorrowerName" class="font-bold text-slate-900 text-xs"></span>
+          </div>
+          <div class="p-2 rounded bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-500 uppercase font-bold block">Nomor WhatsApp</span>
+            <span id="docBorrowerPhone" class="font-semibold text-slate-800 font-mono"></span>
+          </div>
+          <div class="p-2 rounded bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-500 uppercase font-bold block">Waktu Pinjam</span>
+            <span id="docBorrowDate" class="font-semibold text-slate-800"></span>
+          </div>
+          <div class="p-2 rounded bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-500 uppercase font-bold block">Waktu Kembali</span>
+            <span id="docReturnDate" class="font-semibold text-slate-800">-</span>
+          </div>
+          <div class="p-2 rounded bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-500 uppercase font-bold block">Kondisi Pengembalian</span>
+            <span id="docConditionReturn" class="font-semibold text-slate-800">-</span>
           </div>
         </div>
 
         <div>
-          <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">Tanda Tangan Verifikasi</span>
-          <div class="grid grid-cols-2 gap-1.5">
-            <div class="border border-slate-200 rounded-lg p-1 text-center">
-              <span class="text-[9px] text-slate-400 block mb-0.5">Peminjam</span>
-              <div class="h-14 flex items-center justify-center">
-                <img id="docSigBorrow" src="" alt="TTD Pinjam" class="max-h-full max-w-full" />
+          <h5 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Inspeksi Fisik Digital</h5>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="border border-slate-200 rounded-lg p-1.5 text-center bg-slate-50">
+              <span class="text-[10px] font-bold text-slate-600 block mb-1">Foto Sebelum Pinjam</span>
+              <div class="h-32 flex items-center justify-center bg-slate-200 rounded overflow-hidden">
+                <img id="docPhotoBefore" src="" alt="Sebelum Pinjam" class="h-full w-full object-cover" />
               </div>
-              <span id="docBorrowerSignName" class="text-[10px] font-bold text-slate-800 block border-t pt-0.5"></span>
             </div>
-            <div class="border border-slate-200 rounded-lg p-1 text-center">
-              <span class="text-[9px] text-slate-400 block mb-0.5">Petugas Gudang</span>
-              <div class="h-14 flex items-center justify-center">
-                <img id="docSigReturn" src="" alt="TTD Selesai" class="max-h-full max-w-full" />
-                <span id="docSigReturnEmpty" class="text-[10px] text-slate-400 hidden">-</span>
+            <div class="border border-slate-200 rounded-lg p-1.5 text-center bg-slate-50">
+              <span class="text-[10px] font-bold text-slate-600 block mb-1">Foto Saat Selesai</span>
+              <div class="h-32 flex items-center justify-center bg-slate-200 rounded overflow-hidden">
+                <img id="docPhotoAfter" src="" alt="Sesudah Pinjam" class="h-full w-full object-cover" />
+                <span id="docPhotoAfterEmpty" class="text-xs text-slate-400 hidden">Belum Kembali</span>
               </div>
-              <span class="text-[10px] font-bold text-slate-800 block border-t pt-0.5">Petugas Unit</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h5 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pengesahan Para Pihak</h5>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="border border-slate-200 rounded-lg p-2 text-center">
+              <span class="text-[10px] text-slate-500 font-semibold block mb-1">Peminjam</span>
+              <div class="h-16 flex items-center justify-center">
+                <img id="docSigBorrow" src="" alt="TTD Peminjam" class="max-h-full max-w-full" />
+              </div>
+              <span id="docBorrowerSignName" class="text-[11px] font-bold text-slate-800 block border-t border-slate-200 pt-1 mt-1"></span>
+            </div>
+            <div class="border border-slate-200 rounded-lg p-2 text-center">
+              <span class="text-[10px] text-slate-500 font-semibold block mb-1">Penerima / Gudang</span>
+              <div class="h-16 flex items-center justify-center">
+                <img id="docSigReturn" src="" alt="TTD Penerima" class="max-h-full max-w-full" />
+                <span id="docSigReturnEmpty" class="text-xs text-slate-400 hidden">-</span>
+              </div>
+              <span class="text-[11px] font-bold text-slate-800 block border-t border-slate-200 pt-1 mt-1">Petugas Unit</span>
             </div>
           </div>
         </div>
       </div>
 
       <div class="flex items-center gap-2 pt-1">
-        <button id="btnDownloadPDF" onclick="generatePDF()" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+        <button id="btnDownloadPDF" onclick="generatePDF()" class="flex-1 py-2.5 px-3 bg-red-700 hover:bg-red-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-2xs">
           <i class="fa-solid fa-file-pdf"></i> Download PDF
         </button>
-        <button id="btnShareWA" onclick="shareWhatsAppWithPhoto(currentDetailLoan)" class="flex-1 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5">
-          <i class="fa-brands fa-whatsapp text-sm"></i> Share WA + Foto
+        <button id="btnShareWA" onclick="shareWhatsAppFromDetail()" class="flex-1 py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-2xs">
+          <i class="fa-brands fa-whatsapp text-sm"></i> Share WhatsApp
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: TAMBAH MASTER ALAT -->
+  <!-- ========================================================
+       MODAL 3: TAMBAH MASTER ALAT
+  ======================================================== -->
   <div id="addToolModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-4 shadow-2xl space-y-3">
-      <div class="flex items-center justify-between border-b pb-2">
-        <h3 class="font-bold text-slate-900 text-xs uppercase">Tambah Aset Baru</h3>
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-900 text-sm">Tambah Aset Alat Baru</h3>
         <button onclick="closeAddToolModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <form onsubmit="handleAddToolSubmit(event)" class="space-y-2.5 text-xs">
+      <form onsubmit="handleAddToolSubmit(event)" class="space-y-3 text-xs">
         <div>
-          <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Nama Alat *</label>
-          <input type="text" id="newToolName" required placeholder="Contoh: Bor Cordless" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl" />
+          <label class="block font-bold text-slate-700 mb-1">Nama Alat *</label>
+          <input type="text" id="newToolName" required placeholder="Contoh: Digital Clamp Meter Hioki" class="w-full px-3 py-2 bg-slate-50 border rounded-lg" />
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Kategori</label>
-          <input type="text" id="newToolCategory" placeholder="Power Tools / Hand Tools" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl" />
+          <label class="block font-bold text-slate-700 mb-1">Kategori Alat</label>
+          <input type="text" id="newToolCategory" placeholder="Power Tools, Alat Ukur, dsb" class="w-full px-3 py-2 bg-slate-50 border rounded-lg" />
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Kondisi Fisik</label>
-          <select id="newToolCondition" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl font-medium">
-            <option value="Baik">Baik & Berfungsi</option>
-            <option value="Perlu Perhatian">Perlu Perhatian</option>
+          <label class="block font-bold text-slate-700 mb-1">Kondisi Fisik</label>
+          <select id="newToolCondition" class="w-full px-3 py-2 bg-slate-50 border rounded-lg">
+            <option value="Baik">Baik & Berfungsi Normal</option>
+            <option value="Perlu Perhatian">Perlu Kalibrasi / Perawatan</option>
           </select>
         </div>
-        <button type="submit" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-sm">Simpan Alat</button>
+        <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg shadow-sm">Simpan ke Katalog</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL 4: EDIT MASTER ALAT -->
+  <!-- ========================================================
+       MODAL 4: EDIT MASTER ALAT
+  ======================================================== -->
   <div id="editToolModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-4 shadow-2xl space-y-3">
-      <div class="flex items-center justify-between border-b pb-2">
-        <h3 class="font-bold text-slate-900 text-xs uppercase flex items-center gap-1.5">
-          <i class="fa-solid fa-pen-to-square text-emerald-600"></i> Edit Data Alat
-        </h3>
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-blue-600"></i>
+          <h3 class="font-bold text-slate-900 text-sm">Edit Data Alat</h3>
+        </div>
         <button onclick="closeEditToolModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <form onsubmit="handleEditToolSubmit(event)" class="space-y-2.5 text-xs">
+      <form onsubmit="handleEditToolSubmit(event)" class="space-y-3 text-xs">
         <input type="hidden" id="editToolId" />
         <div>
-          <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Kode Alat</label>
-          <input type="text" id="editToolIdDisplay" disabled class="w-full px-2.5 py-1 bg-slate-100 text-slate-400 border rounded-xl font-mono text-[11px]" />
+          <label class="block font-bold text-slate-700 mb-1">Kode / ID Alat</label>
+          <input type="text" id="editToolIdDisplay" disabled class="w-full px-3 py-2 bg-slate-100 text-slate-500 border rounded-lg font-mono font-bold cursor-not-allowed" />
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Nama Alat *</label>
-          <input type="text" id="editToolName" required class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl font-medium" />
+          <label class="block font-bold text-slate-700 mb-1">Nama Alat *</label>
+          <input type="text" id="editToolName" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium" />
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Kategori</label>
-          <input type="text" id="editToolCategory" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl" />
+          <label class="block font-bold text-slate-700 mb-1">Kategori</label>
+          <input type="text" id="editToolCategory" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Kondisi</label>
-            <select id="editToolCondition" class="w-full px-2 py-1.5 bg-slate-50 border rounded-xl font-medium">
+            <label class="block font-bold text-slate-700 mb-1">Kondisi</label>
+            <select id="editToolCondition" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium">
               <option value="Baik">Baik</option>
+              <option value="Kotor">Kotor</option>
               <option value="Rusak Ringan">Rusak Ringan</option>
               <option value="Rusak Berat">Rusak Berat</option>
+              <option value="Perlu Perhatian">Perlu Perhatian</option>
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Status</label>
-            <select id="editToolStatus" class="w-full px-2 py-1.5 bg-slate-50 border rounded-xl font-medium">
+            <label class="block font-bold text-slate-700 mb-1">Status Sirkulasi</label>
+            <select id="editToolStatus" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium">
               <option value="TERSEDIA">TERSEDIA</option>
               <option value="DIPINJAM">DIPINJAM</option>
               <option value="RUSAK">RUSAK</option>
             </select>
           </div>
         </div>
-        <button type="submit" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-sm">Perbarui Alat</button>
+        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition">Perbarui Data Alat</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL 5: EDIT TRANSAKSI -->
+  <!-- ========================================================
+       MODAL 5: EDIT TRANSAKSI / LOG PEMINJAMAN
+  ======================================================== -->
   <div id="editLoanModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b pb-2">
-        <div>
-          <h3 class="font-bold text-slate-900 text-xs uppercase flex items-center gap-1">
-            <i class="fa-solid fa-file-pen text-emerald-600"></i> Edit Transaksi
-          </h3>
-          <p id="editLoanSubId" class="text-[9px] text-slate-400 font-mono"></p>
+    <div class="bg-white rounded-t-2xl sm:rounded-2xl max-w-xl w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-file-pen text-blue-600"></i>
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm">Edit Data Transaksi Sirkulasi</h3>
+            <p id="editLoanSubId" class="text-xs text-slate-500 font-mono"></p>
+          </div>
         </div>
         <button onclick="closeEditLoanModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <form onsubmit="handleEditLoanSubmit(event)" class="space-y-2.5 text-xs">
+      <form onsubmit="handleEditLoanSubmit(event)" class="space-y-3.5 text-xs">
         <input type="hidden" id="editLoanId" />
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Nama Peminjam *</label>
-            <input type="text" id="editLoanBorrowerName" required class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl font-medium" />
+            <label class="block font-bold text-slate-700 mb-1">Nama Peminjam *</label>
+            <input type="text" id="editLoanBorrowerName" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Nomor WA *</label>
-            <input type="tel" id="editLoanBorrowerPhone" required class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl font-mono" />
+            <label class="block font-bold text-slate-700 mb-1">Nomor WhatsApp *</label>
+            <input type="tel" id="editLoanBorrowerPhone" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono font-medium" />
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Waktu Pinjam *</label>
-            <input type="datetime-local" id="editLoanBorrowDate" required class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl" />
+            <label class="block font-bold text-slate-700 mb-1">Waktu Pinjam *</label>
+            <input type="datetime-local" id="editLoanBorrowDate" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Status *</label>
-            <select id="editLoanStatus" class="w-full px-2 py-1.5 bg-slate-50 border rounded-xl font-semibold">
+            <label class="block font-bold text-slate-700 mb-1">Status Transaksi *</label>
+            <select id="editLoanStatus" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium">
               <option value="DIPINJAM">DIPINJAM</option>
               <option value="KEMBALI">KEMBALI</option>
             </select>
@@ -659,30 +717,35 @@
         </div>
 
         <div>
-          <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Catatan Pinjam</label>
-          <textarea id="editLoanNotesBorrow" rows="2" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl"></textarea>
+          <label class="block font-bold text-slate-700 mb-1">Catatan Peminjaman</label>
+          <textarea id="editLoanNotesBorrow" rows="2" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium"></textarea>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 pt-1 border-t">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-100">
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Waktu Kembali</label>
-            <input type="datetime-local" id="editLoanReturnDate" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl" />
+            <label class="block font-bold text-slate-700 mb-1">Waktu Kembali (Opsional)</label>
+            <input type="datetime-local" id="editLoanReturnDate" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Kondisi Kembali</label>
-            <input type="text" id="editLoanConditionReturn" placeholder="Baik / Rusak" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl" />
+            <label class="block font-bold text-slate-700 mb-1">Kondisi Saat Kembali</label>
+            <input type="text" id="editLoanConditionReturn" placeholder="Baik & Lengkap / Rusak dsb" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium" />
           </div>
         </div>
 
-        <button type="submit" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-sm">
-          Simpan Koreksi Transaksi
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Catatan Pengembalian</label>
+          <textarea id="editLoanNotesReturn" rows="2" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-medium"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs shadow-sm transition">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Perubahan Transaksi
         </button>
       </form>
     </div>
   </div>
 
   <!-- ========================================================
-       CORE JAVASCRIPT
+       APPLICATION LOGIC SCRIPT
   ======================================================== -->
   <script>
     // 1. SUPABASE CONNECTION
@@ -695,10 +758,10 @@
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       }
     } catch (e) {
-      console.warn("Supabase init info:", e);
+      console.warn("Inisialisasi Supabase:", e);
     }
 
-    // STATE IN-MEMORY
+    // DATA STATE
     let tools = [
       { id: "ALT-001", name: "Bor Tangan Cordless Bosch 18V", category: "Power Tools", condition: "Baik", status: "TERSEDIA" },
       { id: "ALT-002", name: "Multimeter Digital Sanwa CD800a", category: "Alat Ukur", condition: "Baik", status: "TERSEDIA" },
@@ -720,10 +783,10 @@
       }
 
       setupCanvas() {
-        this.ctx.lineWidth = 2.0;
+        this.ctx.lineWidth = 2.2;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
-        this.ctx.strokeStyle = '#064e3b';
+        this.ctx.strokeStyle = '#0f172a';
       }
 
       getCoordinates(e) {
@@ -798,7 +861,7 @@
 
     let borrowSigPad, returnSigPad;
 
-    // 3. IMAGE COMPRESSION (TARGET <= 100 KB)
+    // 3. IMAGE COMPRESSION (≤ 100 KB)
     async function processImage(fileInput, type) {
       const file = fileInput.files[0];
       if (!file) return;
@@ -820,9 +883,9 @@
         containerEl.classList.remove('hidden');
 
         badgeEl.textContent = `Tersimpan: ${approxSizeKB} KB (≤100KB)`;
-        badgeEl.className = "text-[9px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full border border-emerald-300";
+        badgeEl.className = "text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200";
       } catch (err) {
-        alert("Gagal memproses foto: " + err.message);
+        alert("Gagal memproses gambar: " + err.message);
       } finally {
         progressEl.classList.add('hidden');
         fileInput.value = '';
@@ -842,7 +905,7 @@
 
             let width = img.width;
             let height = img.height;
-            const maxDimension = 900;
+            const maxDimension = 960;
 
             if (width > maxDimension || height > maxDimension) {
               if (width > height) {
@@ -858,7 +921,7 @@
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
 
-            let quality = 0.80;
+            let quality = 0.82;
             let dataUrl = canvas.toDataURL('image/jpeg', quality);
 
             while ((dataUrl.length * 3 / 4) > (98 * 1024) && quality > 0.15) {
@@ -870,7 +933,7 @@
               canvas.width = Math.round(width * 0.7);
               canvas.height = Math.round(height * 0.7);
               ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+              dataUrl = canvas.toDataURL('image/jpeg', 0.65);
             }
 
             resolve(dataUrl);
@@ -887,7 +950,7 @@
       document.getElementById(`${type}PhotoPreviewContainer`).classList.add('hidden');
       const badge = document.getElementById(`${type}PhotoBadge`);
       badge.textContent = 'Auto ≤ 100 KB';
-      badge.className = 'text-[9px] font-bold text-slate-500';
+      badge.className = 'text-[10px] font-semibold text-slate-500';
     }
 
     function clearSignature(type) {
@@ -909,7 +972,7 @@
           .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
 
         if (error) {
-          console.warn("Storage upload warn:", error.message);
+          console.warn("Storage upload error:", error.message);
           return base64Data;
         }
 
@@ -919,12 +982,12 @@
 
         return publicData.publicUrl;
       } catch (e) {
-        console.warn("Storage catch fallback:", e);
+        console.warn("Upload catch error:", e);
         return base64Data;
       }
     }
 
-    // 4. DATABASE SINKRONISASI
+    // 4. DATABASE SYNC
     async function refreshData() {
       if (!supabaseClient) {
         loadLocalData();
@@ -953,7 +1016,7 @@
         saveToLocalStorageCache();
         renderAll();
       } catch (err) {
-        console.warn("Supabase fallback local:", err);
+        console.warn("Supabase sync fallback:", err);
         loadLocalData();
       }
     }
@@ -971,11 +1034,11 @@
         localStorage.setItem('app_tools_cache', JSON.stringify(tools));
         localStorage.setItem('app_loans_cache', JSON.stringify(loans));
       } catch(e) {
-        console.warn("Storage quota:", e);
+        console.warn("Local storage cache limit:", e);
       }
     }
 
-    // 5. TRANSAKSI LOGIC (PINJAM & KEMBALI)
+    // 5. CRUD: PINJAM, RETURN, EDIT & HAPUS
     async function handleBorrowSubmit(e) {
       e.preventDefault();
       const toolId = document.getElementById('borrowToolSelect').value;
@@ -986,16 +1049,25 @@
       const photoData = document.getElementById('borrowPhotoData').value;
       const signatureData = borrowSigPad ? borrowSigPad.toDataURL() : null;
 
-      if (!toolId) return alert("Pilih alat yang hendak dipinjam.");
-      if (!photoData) return alert("Wajib lampirkan foto fisik awal!");
-      if (!signatureData) return alert("Wajib bubuhkan tanda tangan peminjam!");
+      if (!toolId) {
+        alert("Pilih alat yang hendak dipinjam.");
+        return;
+      }
+      if (!photoData) {
+        alert("Wajib menyertakan foto kondisi fisik sebelum peminjaman!");
+        return;
+      }
+      if (!signatureData) {
+        alert("Wajib membubuhkan tanda tangan peminjam!");
+        return;
+      }
 
       const selectedTool = tools.find(t => t.id === toolId);
-      const loanId = "TRX-" + Date.now().toString().slice(-6);
+      const loanId = "PINJAM-" + Date.now().toString().slice(-6);
 
       const btn = document.getElementById('submitBorrowBtn');
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan Data...`;
 
       try {
         const photoUrl = await uploadToSupabaseStorage(photoData, `before_${loanId}`);
@@ -1034,14 +1106,14 @@
         switchTab('dashboard');
         renderAll();
 
-        if (confirm("Kirim rincian transaksi + foto ke WhatsApp sekarang?")) {
-          shareWhatsAppWithPhoto(newLoan);
+        if (confirm("Kirim rincian peminjaman via WhatsApp ke peminjam?")) {
+          shareWhatsApp(newLoan);
         }
       } catch (err) {
-        alert("Gagal menyimpan: " + err.message);
+        alert("Kendala penyimpanan: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-check-circle"></i> <span>Simpan Peminjaman</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Simpan & Daftarkan Peminjaman</span>`;
       }
     }
 
@@ -1050,7 +1122,7 @@
       if (!loan) return;
 
       document.getElementById('returnLoanId').value = loan.id;
-      document.getElementById('returnToolTitle').textContent = `${loan.tool_name} • ${loan.borrower_name}`;
+      document.getElementById('returnToolTitle').textContent = `${loan.tool_name} • Peminjam: ${loan.borrower_name}`;
       
       const now = new Date();
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -1078,12 +1150,18 @@
       const photoData = document.getElementById('returnPhotoData').value;
       const signatureData = returnSigPad ? returnSigPad.toDataURL() : null;
 
-      if (!photoData) return alert("Wajib lampirkan foto kondisi saat kembali!");
-      if (!signatureData) return alert("Wajib tanda tangan penerima!");
+      if (!photoData) {
+        alert("Wajib menyertakan foto kondisi alat saat dikembalikan!");
+        return;
+      }
+      if (!signatureData) {
+        alert("Wajib membubuhkan tanda tangan verifikasi pengembalian!");
+        return;
+      }
 
       const btn = document.getElementById('submitReturnBtn');
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
 
       try {
         const photoUrl = await uploadToSupabaseStorage(photoData, `after_${loanId}`);
@@ -1120,16 +1198,19 @@
         closeReturnModal();
         alert("Pengembalian alat telah diverifikasi!");
         renderAll();
+
         openDetailModal(loanId);
       } catch (err) {
-        alert("Gagal memproses: " + err.message);
+        alert("Gagal mengupdate pengembalian: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-check mr-1"></i> Konfirmasi Selesai`;
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> <span>Konfirmasi Selesai Pengembalian</span>`;
       }
     }
 
-    // 6. EDIT & HAPUS LOGIC
+    // ==========================================
+    // MENU EDIT & HAPUS: TRANSAKSI (LOANS)
+    // ==========================================
     function openEditLoanModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1143,6 +1224,7 @@
       document.getElementById('editLoanNotesBorrow').value = loan.notes_borrow || '';
       document.getElementById('editLoanReturnDate').value = loan.return_date || '';
       document.getElementById('editLoanConditionReturn').value = loan.condition_return || '';
+      document.getElementById('editLoanNotesReturn').value = loan.notes_return || '';
 
       document.getElementById('editLoanModal').classList.remove('hidden');
     }
@@ -1164,7 +1246,8 @@
         status: document.getElementById('editLoanStatus').value,
         notes_borrow: document.getElementById('editLoanNotesBorrow').value.trim(),
         return_date: document.getElementById('editLoanReturnDate').value || null,
-        condition_return: document.getElementById('editLoanConditionReturn').value.trim() || null
+        condition_return: document.getElementById('editLoanConditionReturn').value.trim() || null,
+        notes_return: document.getElementById('editLoanNotesReturn').value.trim() || null
       };
 
       try {
@@ -1177,9 +1260,9 @@
         saveToLocalStorageCache();
         closeEditLoanModal();
         renderAll();
-        alert("Transaksi berhasil diperbarui!");
+        alert("Data transaksi berhasil diperbarui!");
       } catch (err) {
-        alert("Gagal update: " + err.message);
+        alert("Gagal memperbarui transaksi: " + err.message);
       }
     }
 
@@ -1187,13 +1270,15 @@
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
 
-      if (!confirm(`Hapus permanen transaksi "${loan.id}" (${loan.tool_name})?`)) return;
+      const confirmMsg = `Yakin ingin MENGHAPUS permanen transaksi "${loan.id}" (${loan.tool_name} - ${loan.borrower_name})? Data yang dihapus tidak dapat dikembalikan.`;
+      if (!confirm(confirmMsg)) return;
 
       try {
         if (supabaseClient) {
           const { error } = await supabaseClient.from('loans').delete().eq('id', loanId);
           if (error) throw error;
 
+          // Jika peminjaman aktif dihapus, kembalikan status alat jadi TERSEDIA
           if (loan.status === 'DIPINJAM' && loan.tool_id) {
             await supabaseClient.from('tools').update({ status: 'TERSEDIA' }).eq('id', loan.tool_id);
           }
@@ -1207,12 +1292,15 @@
 
         saveToLocalStorageCache();
         renderAll();
-        alert("Transaksi telah dihapus!");
+        alert("Transaksi peminjaman berhasil dihapus!");
       } catch (err) {
-        alert("Gagal menghapus: " + err.message);
+        alert("Gagal menghapus transaksi: " + err.message);
       }
     }
 
+    // ==========================================
+    // MENU EDIT & HAPUS: MASTER ALAT (TOOLS)
+    // ==========================================
     function openEditToolModal(toolId) {
       const tool = tools.find(t => t.id === toolId);
       if (!tool) return;
@@ -1254,9 +1342,9 @@
         saveToLocalStorageCache();
         closeEditToolModal();
         renderAll();
-        alert("Data alat berhasil diperbarui!");
+        alert("Data master alat berhasil diperbarui!");
       } catch (err) {
-        alert("Gagal update alat: " + err.message);
+        alert("Gagal memperbarui alat: " + err.message);
       }
     }
 
@@ -1264,12 +1352,14 @@
       const tool = tools.find(t => t.id === toolId);
       if (!tool) return;
 
-      const isBorrowed = loans.some(l => l.tool_id === toolId && l.status === 'DIPINJAM');
-      if (isBorrowed) {
-        return alert(`Alat "${tool.name}" sedang berstatus DIPINJAM. Selesaikan transaksi terlebih dahulu.`);
+      // Cek apakah alat sedang aktif dipinjam
+      const isBeingBorrowed = loans.some(l => l.tool_id === toolId && l.status === 'DIPINJAM');
+      if (isBeingBorrowed) {
+        alert(`Alat "${tool.name}" saat ini SEDANG DIPINJAM. Selesaikan atau hapus transaksi peminjamannya terlebih dahulu.`);
+        return;
       }
 
-      if (!confirm(`Hapus alat "${tool.name}" (${tool.id}) dari inventaris?`)) return;
+      if (!confirm(`Yakin ingin MENGHAPUS alat "${tool.name}" (${tool.id}) dari inventaris?`)) return;
 
       try {
         if (supabaseClient) {
@@ -1280,13 +1370,13 @@
         tools = tools.filter(t => t.id !== toolId);
         saveToLocalStorageCache();
         renderAll();
-        alert("Alat telah dihapus dari inventaris!");
+        alert("Alat berhasil dihapus dari inventaris!");
       } catch (err) {
-        alert("Gagal menghapus: " + err.message);
+        alert("Gagal menghapus alat: " + err.message);
       }
     }
 
-    // 7. RENDER LOGIC
+    // 6. RENDER LOGIC
     function renderAll() {
       renderStats();
       renderLoans();
@@ -1330,44 +1420,44 @@
       placeholder.classList.add('hidden');
 
       filtered.forEach(loan => {
-        // Desktop Row
+        // Desktop Table Row
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
         tr.innerHTML = `
-          <td class="py-2.5 px-3">
-            <span class="font-bold text-slate-800 block text-xs">${loan.tool_name}</span>
-            <span class="text-[9px] text-slate-400 font-mono">${loan.id}</span>
+          <td class="py-3 px-4">
+            <span class="font-bold text-slate-900 block">${loan.tool_name}</span>
+            <span class="text-[10px] text-slate-400 font-mono font-medium">${loan.id}</span>
           </td>
-          <td class="py-2.5 px-3">
-            <div class="font-bold text-slate-800 text-xs">${loan.borrower_name}</div>
-            <div class="text-[10px] text-slate-400 font-mono">${loan.borrower_phone}</div>
+          <td class="py-3 px-4">
+            <div class="font-bold text-slate-800">${loan.borrower_name}</div>
+            <div class="text-[11px] text-slate-400 font-mono">${loan.borrower_phone}</div>
           </td>
-          <td class="py-2.5 px-3 text-[10px] text-slate-600">${formatDateTime(loan.borrow_date)}</td>
-          <td class="py-2.5 px-3 text-center">
-            <img src="${loan.photo_before}" onclick="openImagePopup('${loan.photo_before}')" class="w-8 h-8 object-cover rounded-lg border border-slate-200 mx-auto cursor-pointer hover:scale-105 transition" />
+          <td class="py-3 px-4 text-[11px] text-slate-600">${formatDateTime(loan.borrow_date)}</td>
+          <td class="py-3 px-4 text-center">
+            <img src="${loan.photo_before}" onclick="openImagePopup('${loan.photo_before}')" class="w-10 h-10 object-cover rounded border border-slate-200 mx-auto cursor-pointer hover:scale-105 transition" title="Foto Sebelum" />
           </td>
-          <td class="py-2.5 px-3 text-[10px] text-slate-600">${loan.return_date ? formatDateTime(loan.return_date) : '<span class="text-amber-600 font-semibold">-</span>'}</td>
-          <td class="py-2.5 px-3 text-center">
+          <td class="py-3 px-4 text-[11px] text-slate-600">${loan.return_date ? formatDateTime(loan.return_date) : '<span class="text-amber-600 font-semibold">-</span>'}</td>
+          <td class="py-3 px-4 text-center">
             ${loan.photo_after ? 
-              `<img src="${loan.photo_after}" onclick="openImagePopup('${loan.photo_after}')" class="w-8 h-8 object-cover rounded-lg border border-slate-200 mx-auto cursor-pointer hover:scale-105 transition" />` : 
-              '<span class="text-[10px] text-slate-300">-</span>'
+              `<img src="${loan.photo_after}" onclick="openImagePopup('${loan.photo_after}')" class="w-10 h-10 object-cover rounded border border-slate-200 mx-auto cursor-pointer hover:scale-105 transition" title="Foto Sesudah" />` : 
+              '<span class="text-[11px] text-slate-300 italic">-</span>'
             }
           </td>
-          <td class="py-2.5 px-3 text-center">
+          <td class="py-3 px-4 text-center">
             ${loan.status === 'DIPINJAM' ? 
-              '<span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-300">Dipinjam</span>' : 
-              '<span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300">Kembali</span>'
+              '<span class="px-2 py-0.5 text-[10px] font-bold rounded bg-amber-50 text-amber-700 border border-amber-300">Dipinjam</span>' : 
+              '<span class="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-300">Kembali</span>'
             }
           </td>
-          <td class="py-2.5 px-3 text-right">
+          <td class="py-3 px-4 text-right">
             <div class="flex items-center justify-end gap-1">
               ${loan.status === 'DIPINJAM' ? `
-                <button onclick="openReturnModal('${loan.id}')" class="px-2 py-0.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[10px] font-bold">Kembali</button>
+                <button onclick="openReturnModal('${loan.id}')" class="px-2 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-bold shadow-2xs" title="Proses Pengembalian">Kembali</button>
               ` : ''}
-              <button onclick="openDetailModal('${loan.id}')" class="p-1 text-slate-600 hover:text-blue-600 rounded text-xs" title="Berita Acara"><i class="fa-solid fa-file-invoice"></i></button>
-              <button onclick="shareWhatsAppWithPhoto(loans.find(l=>l.id==='${loan.id}'))" class="p-1 text-slate-600 hover:text-emerald-600 rounded text-xs" title="WhatsApp + Foto"><i class="fa-brands fa-whatsapp"></i></button>
-              <button onclick="openEditLoanModal('${loan.id}')" class="p-1 text-slate-600 hover:text-amber-600 rounded text-xs" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-              <button onclick="deleteLoan('${loan.id}')" class="p-1 text-slate-600 hover:text-red-600 rounded text-xs" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
+              <button onclick="openDetailModal('${loan.id}')" class="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded text-xs" title="Lihat Berita Acara"><i class="fa-solid fa-file-invoice"></i></button>
+              <button onclick="shareWhatsAppDirect('${loan.id}')" class="p-1.5 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded text-xs" title="Share WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+              <button onclick="openEditLoanModal('${loan.id}')" class="p-1.5 text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded text-xs" title="Edit Transaksi"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="deleteLoan('${loan.id}')" class="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded text-xs" title="Hapus Transaksi"><i class="fa-solid fa-trash-can"></i></button>
             </div>
           </td>
         `;
@@ -1375,48 +1465,44 @@
 
         // Mobile Card View
         const card = document.createElement('div');
-        card.className = "bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2";
+        card.className = "bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-2.5";
         card.innerHTML = `
-          <div class="flex items-start justify-between gap-1.5">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-xl ${loan.status === 'DIPINJAM' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'} flex items-center justify-center text-xs shrink-0 font-bold">
-                <i class="fa-solid ${loan.status === 'DIPINJAM' ? 'fa-arrow-up-right-from-square' : 'fa-check'}"></i>
-              </div>
-              <div>
-                <h3 class="font-bold text-slate-900 text-xs leading-snug">${loan.tool_name}</h3>
-                <p class="text-[10px] text-slate-500 font-medium">${loan.borrower_name} • <span class="font-mono">${loan.borrower_phone}</span></p>
-              </div>
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider">${loan.id}</span>
+              <h3 class="font-bold text-slate-900 text-sm leading-snug">${loan.tool_name}</h3>
+              <p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-user mr-1 text-slate-400"></i> ${loan.borrower_name} • <span class="font-mono">${loan.borrower_phone}</span></p>
             </div>
             ${loan.status === 'DIPINJAM' ? 
-              '<span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-300 shrink-0">Dipinjam</span>' : 
-              '<span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">Selesai</span>'
+              '<span class="px-2 py-0.5 text-[10px] font-bold rounded bg-amber-50 text-amber-700 border border-amber-300 shrink-0">Dipinjam</span>' : 
+              '<span class="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">Kembali</span>'
             }
           </div>
 
-          <div class="grid grid-cols-2 gap-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+          <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
             <div>
-              <span class="text-[9px] text-slate-400 font-bold block mb-0.5">Kondisi Awal:</span>
-              <img src="${loan.photo_before}" onclick="openImagePopup('${loan.photo_before}')" class="w-full h-16 object-cover rounded-lg border border-slate-200" />
+              <span class="text-[10px] text-slate-500 font-bold block mb-1">Foto Sebelum:</span>
+              <img src="${loan.photo_before}" onclick="openImagePopup('${loan.photo_before}')" class="w-full h-24 object-cover rounded border border-slate-200" />
             </div>
             <div>
-              <span class="text-[9px] text-slate-400 font-bold block mb-0.5">Kondisi Akhir:</span>
+              <span class="text-[10px] text-slate-500 font-bold block mb-1">Foto Sesudah:</span>
               ${loan.photo_after ? 
-                `<img src="${loan.photo_after}" onclick="openImagePopup('${loan.photo_after}')" class="w-full h-16 object-cover rounded-lg border border-slate-200" />` : 
-                `<div class="w-full h-16 bg-slate-200/50 rounded-lg flex items-center justify-center text-slate-400 text-[9px] italic">Belum kembali</div>`
+                `<img src="${loan.photo_after}" onclick="openImagePopup('${loan.photo_after}')" class="w-full h-24 object-cover rounded border border-slate-200" />` : 
+                `<div class="w-full h-24 bg-slate-200/50 rounded flex items-center justify-center text-slate-400 text-[10px] italic">Belum kembali</div>`
               }
             </div>
           </div>
 
-          <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
-            <span class="text-slate-400 font-medium">${formatDateTime(loan.borrow_date)}</span>
+          <div class="flex items-center justify-between text-xs pt-1.5 border-t border-slate-100">
+            <span class="text-[10px] text-slate-400 font-medium">Pinjam: ${formatDateTime(loan.borrow_date)}</span>
             <div class="flex items-center gap-1">
               ${loan.status === 'DIPINJAM' ? `
-                <button onclick="openReturnModal('${loan.id}')" class="px-2 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-[10px] shadow-2xs">Kembali</button>
+                <button onclick="openReturnModal('${loan.id}')" class="px-2 py-1 bg-emerald-700 text-white rounded font-bold text-[11px]">Kembali</button>
               ` : ''}
-              <button onclick="openDetailModal('${loan.id}')" class="p-1 bg-slate-100 text-slate-700 rounded-lg" title="PDF"><i class="fa-solid fa-file-invoice"></i></button>
-              <button onclick="shareWhatsAppWithPhoto(loans.find(l=>l.id==='${loan.id}'))" class="p-1 bg-emerald-50 text-emerald-700 rounded-lg" title="Share WA + Foto"><i class="fa-brands fa-whatsapp"></i></button>
-              <button onclick="openEditLoanModal('${loan.id}')" class="p-1 bg-amber-50 text-amber-700 rounded-lg" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-              <button onclick="deleteLoan('${loan.id}')" class="p-1 bg-red-50 text-red-700 rounded-lg" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
+              <button onclick="openDetailModal('${loan.id}')" class="p-1.5 bg-slate-100 hover:text-blue-700 rounded text-xs" title="Berita Acara"><i class="fa-solid fa-file-invoice"></i></button>
+              <button onclick="shareWhatsAppDirect('${loan.id}')" class="p-1.5 bg-emerald-50 text-emerald-700 rounded text-xs" title="Share WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+              <button onclick="openEditLoanModal('${loan.id}')" class="p-1.5 bg-amber-50 text-amber-700 rounded text-xs" title="Edit Transaksi"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="deleteLoan('${loan.id}')" class="p-1.5 bg-red-50 text-red-700 rounded text-xs" title="Hapus Transaksi"><i class="fa-solid fa-trash-can"></i></button>
             </div>
           </div>
         `;
@@ -1443,27 +1529,27 @@
       grid.innerHTML = '';
       tools.forEach(tool => {
         const card = document.createElement('div');
-        card.className = "p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 transition flex flex-col justify-between shadow-2xs";
+        card.className = "p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-400 transition flex flex-col justify-between";
         card.innerHTML = `
           <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-[9px] font-mono text-slate-400 font-bold uppercase">${tool.id}</span>
-              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-mono text-slate-400 font-bold uppercase">${tool.id}</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded ${
                 tool.status === 'TERSEDIA' ? 'bg-emerald-50 text-emerald-700 border border-emerald-300' :
                 tool.status === 'DIPINJAM' ? 'bg-amber-50 text-amber-700 border border-amber-300' :
                 'bg-red-50 text-red-700 border border-red-300'
               }">${tool.status}</span>
             </div>
-            <h4 class="font-bold text-slate-900 text-xs leading-snug">${tool.name}</h4>
-            <p class="text-[10px] text-slate-400 mt-0.5">Kategori: ${tool.category || '-'}</p>
+            <h4 class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">${tool.name}</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Kategori: ${tool.category || '-'}</p>
           </div>
-          <div class="mt-2.5 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px]">
-            <span class="text-slate-400">Kondisi: <strong class="text-slate-700 font-semibold">${tool.condition || 'Baik'}</strong></span>
+          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+            <span class="text-slate-400">Kondisi: <strong class="text-slate-700">${tool.condition || 'Baik'}</strong></span>
             <div class="flex items-center gap-1">
-              <button onclick="openEditToolModal('${tool.id}')" class="p-1 px-1.5 text-[10px] bg-slate-100 hover:bg-amber-100 hover:text-amber-800 text-slate-600 rounded-lg font-bold" title="Edit Alat">
+              <button onclick="openEditToolModal('${tool.id}')" class="p-1 px-2 text-xs bg-slate-100 hover:bg-amber-100 hover:text-amber-800 text-slate-700 rounded font-semibold transition" title="Edit Alat">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
-              <button onclick="deleteTool('${tool.id}')" class="p-1 px-1.5 text-[10px] bg-slate-100 hover:bg-red-100 hover:text-red-700 text-slate-600 rounded-lg font-bold" title="Hapus Alat">
+              <button onclick="deleteTool('${tool.id}')" class="p-1 px-2 text-xs bg-slate-100 hover:bg-red-100 hover:text-red-700 text-slate-700 rounded font-semibold transition" title="Hapus Alat">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -1473,95 +1559,13 @@
       });
     }
 
-    // ==========================================
-    // 8. SHARE WHATSAPP DENGAN FOTO FISIK
-    // ==========================================
-    async function shareWhatsAppWithPhoto(loan) {
-      if (!loan) return;
-
-      // Buat teks pesan
-      let message = `*BERITA ACARA PINJAM PAKAI ALAT KERJA*\n`;
-      message += `====================================\n`;
-      message += `*No Registrasi:* ${loan.id}\n`;
-      message += `*Nama Alat:* ${loan.tool_name}\n`;
-      message += `*Peminjam:* ${loan.borrower_name}\n`;
-      message += `*Waktu Pinjam:* ${formatDateTime(loan.borrow_date)}\n`;
-      message += `*Status:* ${loan.status}\n`;
-      if (loan.return_date) {
-        message += `*Waktu Kembali:* ${formatDateTime(loan.return_date)}\n`;
-        message += `*Kondisi Akhir:* ${loan.condition_return}\n`;
-      }
-      if (loan.notes_borrow) {
-        message += `*Catatan:* ${loan.notes_borrow}\n`;
-      }
-      message += `====================================\n`;
-
-      // Jika URL foto tersimpan di cloud Supabase, sertakan link langsungnya di pesan
-      if (loan.photo_before && loan.photo_before.startsWith('http')) {
-        message += `*Foto Sebelum Pinjam:* ${loan.photo_before}\n`;
-      }
-      if (loan.photo_after && loan.photo_after.startsWith('http')) {
-        message += `*Foto Saat Kembali:* ${loan.photo_after}\n`;
-      }
-      message += `_Dokumentasi resmi sistem sirkulasi inventaris._`;
-
-      // Ambil foto yang relevan untuk dikirim (utamakan foto sesudah jika sudah kembali, atau foto sebelum)
-      const targetPhoto = loan.photo_after || loan.photo_before;
-
-      // STRATEGI 1: Web Share API (Fitur Native Handphone Android & iOS)
-      // Mampu melampirkan berkas gambar asli langsung ke WhatsApp
-      if (navigator.share && targetPhoto) {
-        try {
-          const res = await fetch(targetPhoto);
-          const blob = await res.blob();
-          const file = new File([blob], `Foto_Alat_${loan.id}.jpg`, { type: 'image/jpeg' });
-
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              title: `Peminjaman Alat - ${loan.tool_name}`,
-              text: message,
-              files: [file]
-            });
-            return; // Berhasil share via dialog native WhatsApp
-          }
-        } catch (err) {
-          console.warn("Native share tidak selesai atau dibatalkan:", err);
-        }
-      }
-
-      // STRATEGI 2: Fallback Desktop / Browser yang belum mendukung file share
-      // Otomatis download file foto ke galeri/unduhan & buka WhatsApp Web
-      if (targetPhoto) {
-        try {
-          const dlLink = document.createElement('a');
-          dlLink.href = targetPhoto;
-          dlLink.download = `Foto_Alat_${loan.id}.jpg`;
-          dlLink.target = '_blank';
-          document.body.appendChild(dlLink);
-          dlLink.click();
-          document.body.removeChild(dlLink);
-        } catch(e) {}
-      }
-
-      let phone = (loan.borrower_phone || '').replace(/\D/g, '');
-      if (phone.startsWith('0')) {
-        phone = '62' + phone.substring(1);
-      }
-
-      const waUrl = phone ? 
-        `https://wa.me/${phone}?text=${encodeURIComponent(message)}` : 
-        `https://wa.me/?text=${encodeURIComponent(message)}`;
-
-      window.open(waUrl, '_blank');
-    }
-
-    // 9. EXPORT PDF & MODAL DETAIL
+    // 7. DETAIL, PDF & WHATSAPP
     function openDetailModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
       currentDetailLoan = loan;
 
-      document.getElementById('docLoanId').textContent = `NO. REG: ${loan.id}`;
+      document.getElementById('docLoanId').textContent = `NO. REGISTRASI: ${loan.id}`;
       document.getElementById('docToolName').textContent = loan.tool_name;
       document.getElementById('docBorrowerName').textContent = loan.borrower_name;
       document.getElementById('docBorrowerPhone').textContent = loan.borrower_phone;
@@ -1570,11 +1574,11 @@
 
       const statusBadge = document.getElementById('docStatusBadge');
       if (loan.status === 'DIPINJAM') {
-        statusBadge.textContent = 'DIPINJAM';
-        statusBadge.className = 'text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-amber-100 text-amber-800 border border-amber-300';
+        statusBadge.textContent = 'AKTIF DIPINJAM';
+        statusBadge.className = 'text-[10px] px-2.5 py-0.5 rounded font-bold uppercase bg-amber-100 text-amber-800 border border-amber-300';
       } else {
-        statusBadge.textContent = 'SELESAI';
-        statusBadge.className = 'text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300';
+        statusBadge.textContent = 'SELESAI / KEMBALI';
+        statusBadge.className = 'text-[10px] px-2.5 py-0.5 rounded font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300';
       }
 
       document.getElementById('docPhotoBefore').src = loan.photo_before;
@@ -1591,7 +1595,7 @@
         document.getElementById('docSigReturn').classList.remove('hidden');
         document.getElementById('docSigReturnEmpty').classList.add('hidden');
       } else {
-        document.getElementById('docReturnDate').textContent = "Belum Kembali";
+        document.getElementById('docReturnDate').textContent = "Belum Dikembalikan";
         document.getElementById('docConditionReturn').textContent = "-";
         document.getElementById('docPhotoAfter').classList.add('hidden');
         document.getElementById('docPhotoAfterEmpty').classList.remove('hidden');
@@ -1612,7 +1616,7 @@
       const element = document.getElementById('pdfContentArea');
       const btn = document.getElementById('btnDownloadPDF');
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Dokumen...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Dokumen PDF...`;
 
       try {
         const canvas = await html2canvas(element, { scale: 2, useCORS: true });
@@ -1632,8 +1636,47 @@
       }
     }
 
+    function shareWhatsApp(loan) {
+      let message = `*BERITA ACARA PINJAM PAKAI ALAT KERJA*\n`;
+      message += `====================================\n`;
+      message += `*No Registrasi:* ${loan.id}\n`;
+      message += `*Nama Alat:* ${loan.tool_name}\n`;
+      message += `*Nama Peminjam:* ${loan.borrower_name}\n`;
+      message += `*Waktu Pinjam:* ${formatDateTime(loan.borrow_date)}\n`;
+      message += `*Status:* ${loan.status}\n`;
+      if (loan.return_date) {
+        message += `*Waktu Kembali:* ${formatDateTime(loan.return_date)}\n`;
+        message += `*Kondisi Akhir:* ${loan.condition_return}\n`;
+      }
+      if (loan.notes_borrow) {
+        message += `*Keperluan:* ${loan.notes_borrow}\n`;
+      }
+      message += `====================================\n`;
+      message += `_Dokumentasi resmi sistem sirkulasi inventaris._`;
+
+      let phone = loan.borrower_phone.replace(/\D/g, '');
+      if (phone.startsWith('0')) {
+        phone = '62' + phone.substring(1);
+      }
+
+      const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+    }
+
+    function shareWhatsAppDirect(loanId) {
+      const loan = loans.find(l => l.id === loanId);
+      if (loan) shareWhatsApp(loan);
+    }
+
+    function shareWhatsAppFromDetail() {
+      if (currentDetailLoan) shareWhatsApp(currentDetailLoan);
+    }
+
     function exportAllCSV() {
-      if (loans.length === 0) return alert("Belum ada data untuk diunduh.");
+      if (loans.length === 0) {
+        alert("Belum ada data untuk diunduh.");
+        return;
+      }
 
       let csvContent = "data:text/csv;charset=utf-8,";
       csvContent += "ID,Nama Alat,Peminjam,No WA,Tgl Pinjam,Status,Tgl Kembali,Kondisi Kembali\n";
@@ -1655,33 +1698,33 @@
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Mutasi_Sirkulasi_Alat_${Date.now()}.csv`);
+      link.setAttribute("download", `Audit_Log_Peminjaman_${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
-    // 10. TABS & UTILITIES
+    // 8. TABS & NAVIGATION
     function switchTab(tabId) {
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
-      // Desktop Tab
+      // Desktop Tab Styling
       document.querySelectorAll('.tab-btn').forEach(btn => {
         if (btn.getAttribute('data-tab') === tabId) {
-          btn.className = "tab-btn active-tab px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-emerald-400 text-emerald-300 flex items-center gap-1.5 transition";
+          btn.className = "tab-btn active-tab px-4 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 border-blue-500 text-blue-400 flex items-center gap-2 transition";
         } else {
-          btn.className = "tab-btn px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-2 border-transparent text-emerald-200/70 hover:text-white flex items-center gap-1.5 transition";
+          btn.className = "tab-btn px-4 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition";
         }
       });
 
-      // Mobile Bottom Nav
+      // Mobile Bottom Nav Styling
       document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
         if (btn.getAttribute('data-tab') === tabId) {
-          btn.classList.add('text-emerald-800', 'font-extrabold');
+          btn.classList.add('text-slate-900', 'font-bold');
           btn.classList.remove('text-slate-400');
         } else {
-          btn.classList.remove('text-emerald-800', 'font-extrabold');
+          btn.classList.remove('text-slate-900', 'font-bold');
           btn.classList.add('text-slate-400');
         }
       });
@@ -1709,7 +1752,7 @@
 
     function openImagePopup(url) {
       const w = window.open("");
-      w.document.write(`<title>Pratinjau Foto</title><body style="margin:0; background:#064e3b; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${url}" style="max-width:95%; max-height:95%; object-fit:contain; border-radius:12px;" /></body>`);
+      w.document.write(`<title>Pratinjau Inspeksi Foto</title><body style="margin:0; background:#0f172a; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${url}" style="max-width:95%; max-height:95%; object-fit:contain; border-radius:8px;" /></body>`);
     }
 
     function openAddToolModal() { document.getElementById('addToolModal').classList.remove('hidden'); }
@@ -1736,6 +1779,7 @@
       alert("Alat baru berhasil ditambahkan!");
     }
 
+    // INITIALIZATION
     window.addEventListener('DOMContentLoaded', () => {
       refreshData();
     });
