@@ -43,7 +43,6 @@
       background: #a7f3d0;
       border-radius: 9999px;
     }
-    /* Khusus untuk area render PDF resolusi tinggi */
     #pdfContentArea {
       color: #0f172a;
       background-color: #ffffff;
@@ -65,7 +64,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-extrabold text-xs tracking-tight text-white uppercase">ToolTrack M-Banking</span>
-            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v2.8</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v2.9</span>
           </div>
           <p class="text-[10px] text-emerald-200/90 font-medium">Sirkulasi & Inspeksi Alat Kerja</p>
         </div>
@@ -171,7 +170,7 @@
                 <th class="py-2.5 px-3">Tgl Pinjam</th>
                 <th class="py-2.5 px-3 text-center">Foto Awal</th>
                 <th class="py-2.5 px-3">Tgl Kembali</th>
-                <th class="py-2.5 px-3 text-center">Foto Akhir</th>
+                <th class="py-2.5 px-3 text-center">Foto Pengembalian</th>
                 <th class="py-2.5 px-3 text-center">Status</th>
                 <th class="py-2.5 px-3 text-right">Aksi</th>
               </tr>
@@ -227,7 +226,6 @@
             </div>
           </div>
 
-          <!-- PETUGAS YANG MEMINJAMKAN -->
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] font-bold text-emerald-900 uppercase tracking-wider mb-1">Petugas yang Meminjamkan <span class="text-red-500">*</span></label>
@@ -482,7 +480,7 @@
           </div>
         </div>
 
-        <!-- TABEL RINCIAN TRANSAKSI (GRID RAPI) -->
+        <!-- TABEL RINCIAN TRANSAKSI -->
         <div class="grid grid-cols-2 gap-2 text-[11px]">
           <div class="p-2 rounded bg-slate-50 border border-slate-200">
             <span class="text-[9px] text-slate-400 uppercase font-bold block">Nama Alat Kerja</span>
@@ -538,7 +536,7 @@
           </div>
         </div>
 
-        <!-- KOLOM TANDA TANGAN BERSAMA NAMA PETUGAS -->
+        <!-- KOLOM TANDA TANGAN -->
         <div class="pt-2">
           <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">Pengesahan Para Pihak</span>
           <div class="grid grid-cols-2 gap-2">
@@ -561,7 +559,6 @@
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- TOMBOL AKSI MODAL -->
@@ -739,7 +736,7 @@
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       }
     } catch (e) {
-      console.warn("Supabase init:", e);
+      console.warn("Supabase init error:", e);
     }
 
     // STATE IN-MEMORY
@@ -939,13 +936,26 @@
       if (type === 'return' && returnSigPad) returnSigPad.clear();
     }
 
+    // Helper Konversi Base64 ke Blob Biner Murni (Stabil di iOS & Android)
+    function dataURLtoBlob(dataurl) {
+      const arr = dataurl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+    }
+
+    // 4. STORAGE SUPABASE UPLOADER (DENGAN PENANGANAN ERROR & FALLBACK ROBUST)
     async function uploadToSupabaseStorage(base64Data, filename) {
       if (!supabaseClient || !base64Data || !base64Data.startsWith('data:image')) {
         return base64Data;
       }
       try {
-        const res = await fetch(base64Data);
-        const blob = await res.blob();
+        const blob = dataURLtoBlob(base64Data);
         const filePath = `uploads/${Date.now()}_${filename}.jpg`;
 
         const { data, error } = await supabaseClient.storage
@@ -953,7 +963,7 @@
           .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
 
         if (error) {
-          console.warn("Storage upload warn:", error.message);
+          console.warn("Storage upload error (fallback Base64):", error.message);
           return base64Data;
         }
 
@@ -963,12 +973,12 @@
 
         return publicData.publicUrl;
       } catch (e) {
-        console.warn("Storage catch fallback:", e);
+        console.warn("Storage exception (fallback Base64):", e);
         return base64Data;
       }
     }
 
-    // 4. DATABASE SINKRONISASI
+    // 5. DATABASE SINKRONISASI
     async function refreshData() {
       if (!supabaseClient) {
         loadLocalData();
@@ -1019,7 +1029,7 @@
       }
     }
 
-    // 5. TRANSAKSI LOGIC (PINJAM & KEMBALI)
+    // 6. TRANSAKSI LOGIC (PINJAM & KEMBALI)
     async function handleBorrowSubmit(e) {
       e.preventDefault();
       const toolId = document.getElementById('borrowToolSelect').value;
@@ -1098,7 +1108,7 @@
       if (!loan) return;
 
       document.getElementById('returnLoanId').value = loan.id;
-      document.getElementById('returnToolTitle').textContent = `${loan.tool_name} • Peminjam: ${loan.borrower_name}`;
+      document.getElementById('returnToolTitle').textContent = `${loan.tool_name} • ${loan.borrower_name}`;
       document.getElementById('officerReturn').value = loan.officer_borrow || '';
       
       const now = new Date();
@@ -1118,6 +1128,7 @@
       document.getElementById('returnModal').classList.add('hidden');
     }
 
+    // PERBAIKAN PENTING: PROSES PENGEMBALIAN FOTO DAN DATA TERSINKRON AKURAT
     async function handleReturnSubmit(e) {
       e.preventDefault();
       const loanId = document.getElementById('returnLoanId').value;
@@ -1129,14 +1140,15 @@
       const signatureData = returnSigPad ? returnSigPad.toDataURL() : null;
 
       if (!officerReturn) return alert("Wajib mengisi nama petugas penerima!");
-      if (!photoData) return alert("Wajib lampirkan foto kondisi saat kembali!");
+      if (!photoData) return alert("Wajib lampirkan foto fisik saat pengembalian!");
       if (!signatureData) return alert("Wajib tanda tangan penerima!");
 
       const btn = document.getElementById('submitReturnBtn');
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah Foto & Menyimpan...`;
 
       try {
+        // Upload foto pengembalian ke Supabase Storage (atau fallback DataURL)
         const photoUrl = await uploadToSupabaseStorage(photoData, `after_${loanId}`);
 
         const updateData = {
@@ -1152,13 +1164,20 @@
         const loan = loans.find(l => l.id === loanId);
 
         if (supabaseClient) {
-          await supabaseClient.from('loans').update(updateData).eq('id', loanId);
+          const { error: loanErr } = await supabaseClient
+            .from('loans')
+            .update(updateData)
+            .eq('id', loanId);
+
+          if (loanErr) throw loanErr;
+
           if (loan && loan.tool_id) {
             const finalToolStatus = returnCondition.includes("Rusak") ? "RUSAK" : "TERSEDIA";
             await supabaseClient.from('tools').update({ status: finalToolStatus, condition: returnCondition }).eq('id', loan.tool_id);
           }
         }
 
+        // Sinkronisasi Instan ke Array Lokal & Cache Browser
         if (loan) {
           Object.assign(loan, updateData);
           const tool = tools.find(t => t.id === loan.tool_id);
@@ -1170,18 +1189,20 @@
 
         saveToLocalStorageCache();
         closeReturnModal();
-        alert("Pengembalian alat telah diverifikasi!");
+        alert("Pengembalian alat telah diverifikasi & foto fisik berhasil tersimpan!");
         renderAll();
+
+        // Buka langsung Berita Acara untuk verifikasi visual foto sebelum vs sesudah
         openDetailModal(loanId);
       } catch (err) {
-        alert("Gagal memproses: " + err.message);
+        alert("Gagal memproses pengembalian: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-check mr-1"></i> Konfirmasi Selesai`;
       }
     }
 
-    // 6. EDIT & HAPUS LOGIC
+    // 7. EDIT & HAPUS LOGIC
     function openEditLoanModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1342,7 +1363,7 @@
       }
     }
 
-    // 7. RENDER LOGIC
+    // 8. RENDER LOGIC (FOTO SEBELUM DAN SESUDAH DITAMPILKAN SECARA ROBUST)
     function renderAll() {
       renderStats();
       renderLoans();
@@ -1404,13 +1425,16 @@
           </td>
           <td class="py-2.5 px-3 text-[10px] text-slate-600">${formatDateTime(loan.borrow_date)}</td>
           <td class="py-2.5 px-3 text-center">
-            <img src="${loan.photo_before}" onclick="openImagePopup('${loan.photo_before}')" class="w-8 h-8 object-cover rounded-lg border border-slate-200 mx-auto cursor-pointer hover:scale-105 transition" />
+            ${loan.photo_before ? 
+              `<img src="${loan.photo_before}" onclick="openImagePopup('${loan.photo_before}')" class="w-9 h-9 object-cover rounded-lg border border-slate-200 mx-auto cursor-pointer hover:scale-105 transition shadow-2xs" title="Foto Sebelum" />` : 
+              '<span class="text-[10px] text-slate-300">-</span>'
+            }
           </td>
           <td class="py-2.5 px-3 text-[10px] text-slate-600">${loan.return_date ? formatDateTime(loan.return_date) : '<span class="text-amber-600 font-semibold">-</span>'}</td>
           <td class="py-2.5 px-3 text-center">
             ${loan.photo_after ? 
-              `<img src="${loan.photo_after}" onclick="openImagePopup('${loan.photo_after}')" class="w-8 h-8 object-cover rounded-lg border border-slate-200 mx-auto cursor-pointer hover:scale-105 transition" />` : 
-              '<span class="text-[10px] text-slate-300">-</span>'
+              `<img src="${loan.photo_after}" onclick="openImagePopup('${loan.photo_after}')" class="w-9 h-9 object-cover rounded-lg border border-emerald-400 mx-auto cursor-pointer hover:scale-105 transition shadow-2xs" title="Foto Saat Kembali" />` : 
+              '<span class="text-[10px] text-slate-300 italic">Belum ada</span>'
             }
           </td>
           <td class="py-2.5 px-3 text-center">
@@ -1433,7 +1457,7 @@
         `;
         tbody.appendChild(tr);
 
-        // Mobile Card View
+        // Mobile Card View (Foto Sebelum & Sesudah Tampil Berdampingan dengan Jelas)
         const card = document.createElement('div');
         card.className = "bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2";
         card.innerHTML = `
@@ -1445,7 +1469,7 @@
               <div>
                 <h3 class="font-bold text-slate-900 text-xs leading-snug">${loan.tool_name}</h3>
                 <p class="text-[10px] text-slate-500 font-medium">${loan.borrower_name} • <span class="font-mono">${loan.borrower_phone}</span></p>
-                <p class="text-[9px] text-emerald-800 font-semibold"><i class="fa-solid fa-id-badge text-[8px] mr-0.5"></i> Petugas: ${loan.officer_borrow || '-'}</p>
+                <p class="text-[9px] text-emerald-800 font-semibold"><i class="fa-solid fa-id-badge text-[8px] mr-0.5"></i> Penyerah: ${loan.officer_borrow || '-'}</p>
               </div>
             </div>
             ${loan.status === 'DIPINJAM' ? 
@@ -1454,16 +1478,20 @@
             }
           </div>
 
+          <!-- Dual Micro Photo Comparison (Sebelum vs Pengembalian) -->
           <div class="grid grid-cols-2 gap-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
             <div>
-              <span class="text-[9px] text-slate-400 font-bold block mb-0.5">Kondisi Awal:</span>
-              <img src="${loan.photo_before}" onclick="openImagePopup('${loan.photo_before}')" class="w-full h-16 object-cover rounded-lg border border-slate-200" />
+              <span class="text-[9px] text-slate-500 font-bold block mb-0.5">Foto Sebelum:</span>
+              ${loan.photo_before ? 
+                `<img src="${loan.photo_before}" onclick="openImagePopup('${loan.photo_before}')" class="w-full h-20 object-cover rounded-lg border border-slate-200" />` : 
+                `<div class="w-full h-20 bg-slate-200/50 rounded-lg flex items-center justify-center text-slate-400 text-[9px] italic">Tidak ada foto</div>`
+              }
             </div>
             <div>
-              <span class="text-[9px] text-slate-400 font-bold block mb-0.5">Kondisi Akhir:</span>
+              <span class="text-[9px] text-emerald-800 font-bold block mb-0.5">Foto Saat Kembali:</span>
               ${loan.photo_after ? 
-                `<img src="${loan.photo_after}" onclick="openImagePopup('${loan.photo_after}')" class="w-full h-16 object-cover rounded-lg border border-slate-200" />` : 
-                `<div class="w-full h-16 bg-slate-200/50 rounded-lg flex items-center justify-center text-slate-400 text-[9px] italic">Belum kembali</div>`
+                `<img src="${loan.photo_after}" onclick="openImagePopup('${loan.photo_after}')" class="w-full h-20 object-cover rounded-lg border border-emerald-300" />` : 
+                `<div class="w-full h-20 bg-slate-200/50 rounded-lg flex items-center justify-center text-slate-400 text-[9px] italic">Belum dikembalikan</div>`
               }
             </div>
           </div>
@@ -1534,13 +1562,10 @@
       });
     }
 
-    // ========================================================
-    // 8. SHARE WHATSAPP: TEKS MURNI RESMI (100% BEBAS LINK)
-    // ========================================================
+    // 9. SHARE WHATSAPP: TEKS BERSIH (100% BEBAS LINK)
     async function shareWhatsAppWithPhoto(loan) {
       if (!loan) return;
 
-      // Format Pesan Teks WhatsApp Resmi Tanpa Tautan Apapun
       let message = `*BERITA ACARA PINJAM PAKAI ALAT KERJA*\n`;
       message += `====================================\n`;
       message += `*No Registrasi:* ${loan.id}\n`;
@@ -1562,12 +1587,16 @@
 
       const targetPhoto = loan.photo_after || loan.photo_before;
 
-      // STRATEGI: Web Share API (Handphone Android & iOS)
-      // Melampirkan langsung foto JPG fisik tanpa menaruh link di teks
       if (navigator.share && targetPhoto) {
         try {
-          const res = await fetch(targetPhoto);
-          const blob = await res.blob();
+          let blob;
+          if (targetPhoto.startsWith('data:image')) {
+            blob = dataURLtoBlob(targetPhoto);
+          } else {
+            const res = await fetch(targetPhoto);
+            blob = await res.blob();
+          }
+
           const file = new File([blob], `Foto_Alat_${loan.id}.jpg`, { type: 'image/jpeg' });
 
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -1583,7 +1612,6 @@
         }
       }
 
-      // Fallback: Direct Chat WhatsApp dengan teks bersih
       let phone = (loan.borrower_phone || '').replace(/\D/g, '');
       if (phone.startsWith('0')) {
         phone = '62' + phone.substring(1);
@@ -1596,9 +1624,7 @@
       window.open(waUrl, '_blank');
     }
 
-    // ========================================================
-    // 9. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
-    // ========================================================
+    // 10. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
     function openDetailModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1621,10 +1647,10 @@
         statusBadge.className = 'text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300';
       }
 
-      document.getElementById('docPhotoBefore').src = loan.photo_before;
-      document.getElementById('docSigBorrow').src = loan.signature_borrow;
+      document.getElementById('docPhotoBefore').src = loan.photo_before || '';
+      document.getElementById('docSigBorrow').src = loan.signature_borrow || '';
 
-      if (loan.return_date) {
+      if (loan.return_date && loan.photo_after) {
         document.getElementById('docReturnDate').textContent = formatDateTime(loan.return_date);
         document.getElementById('docConditionReturn').textContent = loan.condition_return || '-';
         document.getElementById('docOfficerReturn').textContent = loan.officer_return || '-';
@@ -1634,7 +1660,7 @@
         document.getElementById('docPhotoAfter').classList.remove('hidden');
         document.getElementById('docPhotoAfterEmpty').classList.add('hidden');
 
-        document.getElementById('docSigReturn').src = loan.signature_return;
+        document.getElementById('docSigReturn').src = loan.signature_return || '';
         document.getElementById('docSigReturn').classList.remove('hidden');
         document.getElementById('docSigReturnEmpty').classList.add('hidden');
       } else {
@@ -1665,7 +1691,6 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Merender Dokumen HD...`;
 
       try {
-        // Konfigurasi Canvas HD: Scale 3 untuk ketajaman teks & foto maksimal
         const canvas = await html2canvas(element, {
           scale: 3,
           useCORS: true,
@@ -1721,7 +1746,7 @@
       document.body.removeChild(link);
     }
 
-    // 10. TABS & UTILITIES
+    // 11. TABS & UTILITIES
     function switchTab(tabId) {
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
