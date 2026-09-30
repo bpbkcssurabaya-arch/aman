@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>Sistem Sirkulasi & Inventaris Alat Kerja</title>
-  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, pencarian alat interaktif, berita acara digital PDF, dan export Excel/CSV corporate." />
+  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, auto-koneksi nomor WhatsApp perangkat, berita acara digital PDF tajam A4, dan export Excel/CSV corporate." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#064e3b" />
 
@@ -66,7 +66,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-extrabold text-xs tracking-tight text-white uppercase">ToolTrack M-Banking</span>
-            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.6</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.7</span>
           </div>
           <p class="text-[10px] text-emerald-200/90 font-medium">Sirkulasi & Inventaris Alat Kerja</p>
         </div>
@@ -217,11 +217,9 @@
 
         <form id="borrowForm" onsubmit="handleBorrowSubmit(event)" class="space-y-3 text-xs">
           
-          <!-- MODEL SEARCH PENCARIAN ALAT INVENTARIS (BARU & INTERAKTIF) -->
+          <!-- SEARCH MODEL ALAT INVENTARIS -->
           <div>
             <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih Alat Inventaris <span class="text-red-500">*</span></label>
-            
-            <!-- Box Alat Terpilih (Default Kosong / Klik untuk Cari) -->
             <div id="selectedToolBox" onclick="openToolSearchModal()" class="w-full p-2.5 bg-slate-50 hover:bg-emerald-50/40 border border-slate-200 hover:border-emerald-400 rounded-xl cursor-pointer transition flex items-center justify-between group">
               <div class="flex items-center gap-2.5 overflow-hidden">
                 <div id="selectedToolImgContainer" class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center shrink-0 overflow-hidden text-slate-400">
@@ -236,8 +234,6 @@
                 Pilih
               </button>
             </div>
-
-            <!-- Input Tersembunyi untuk Validasi Form & Nilai ID Alat -->
             <input type="hidden" id="borrowToolSelect" required />
           </div>
 
@@ -246,9 +242,21 @@
               <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Peminjam <span class="text-red-500">*</span></label>
               <input type="text" id="borrowerName" required placeholder="Nama peminjam" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600" />
             </div>
+
+            <!-- NOMOR WHATSAPP TERKONEKSI OTOMATIS DENGAN PERANGKAT -->
             <div>
-              <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Nomor WhatsApp <span class="text-red-500">*</span></label>
-              <input type="tel" id="borrowerPhone" required placeholder="08xxxxxxxxxx" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium font-mono focus:bg-white focus:outline-none focus:border-emerald-600" />
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-[10px] font-bold text-slate-700 uppercase tracking-wider">Nomor WhatsApp <span class="text-red-500">*</span></label>
+                <button type="button" onclick="loadSavedDevicePhone()" title="Sinkronkan dengan nomor HP perangkat" class="text-[9px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5">
+                  <i class="fa-solid fa-sim-card text-[9px]"></i> No. Perangkat
+                </button>
+              </div>
+              <div class="relative">
+                <input type="tel" id="borrowerPhone" required placeholder="08xxxxxxxxxx" class="w-full pl-2.5 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium font-mono focus:bg-white focus:outline-none focus:border-emerald-600" />
+                <span id="devicePhoneConnectedIcon" title="Terkoneksi dengan nomor perangkat ini" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-emerald-600 text-[10px] hidden">
+                  <i class="fa-solid fa-circle-check"></i>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -358,13 +366,9 @@
 
   </main>
 
-  <!-- ========================================================
-       MODAL PENCARIAN ALAT (SEARCH MODEL)
-  ======================================================== -->
+  <!-- MODAL PENCARIAN ALAT (SEARCH MODEL) -->
   <div id="toolSearchModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-lg w-full p-4 shadow-2xl space-y-3 my-auto max-h-[88vh] flex flex-col">
-      
-      <!-- Search Input Header -->
       <div class="flex items-center justify-between border-b pb-2.5">
         <div class="flex items-center gap-2">
           <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs">
@@ -375,24 +379,18 @@
         <button onclick="closeToolSearchModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-sm"></i></button>
       </div>
 
-      <!-- Live Search Box -->
       <div class="relative">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
         <input type="text" id="toolModalSearchInput" oninput="filterToolsInModal()" placeholder="Ketik nama alat, merk (cth: Bosch), atau ID..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600 transition" />
       </div>
 
-      <!-- Result Count Info -->
       <div class="flex items-center justify-between px-1 text-[10px] text-slate-400">
         <span>Menampilkan alat berstatus <strong class="text-emerald-700">TERSEDIA</strong></span>
         <span id="toolSearchCountBadge" class="font-mono">0 Alat</span>
       </div>
 
-      <!-- Tool Search List Feed (Scrollable) -->
-      <div id="toolSearchListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100 pr-1 space-y-1 max-h-80">
-        <!-- Rendered via JS -->
-      </div>
+      <div id="toolSearchListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100 pr-1 space-y-1 max-h-80"></div>
 
-      <!-- No Tool Found Placeholder -->
       <div id="noToolFoundPlaceholder" class="hidden py-8 text-center">
         <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-sm mb-1.5">
           <i class="fa-solid fa-boxes-stacked"></i>
@@ -400,13 +398,10 @@
         <p class="font-bold text-slate-600 text-xs">Tidak ada alat yang cocok</p>
         <p class="text-[10px] text-slate-400 mt-0.5">Coba kata kunci lain atau pastikan alat berstatus TERSEDIA.</p>
       </div>
-
     </div>
   </div>
 
-  <!-- ========================================================
-       MOBILE FLOATING BOTTOM NAV DOCK
-  ======================================================== -->
+  <!-- MOBILE FLOATING BOTTOM NAV DOCK -->
   <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-2 left-3 right-3 bg-white/95 backdrop-blur-lg border border-slate-200/90 rounded-2xl z-40 shadow-lg px-2 py-1.5">
     <div class="grid grid-cols-3 items-center text-center">
       <button onclick="switchTab('dashboard')" class="mobile-tab-btn flex flex-col items-center py-1 text-emerald-800 font-bold transition active:scale-95" data-tab="dashboard">
@@ -676,7 +671,6 @@
           </div>
         </div>
 
-        <!-- FOTO FISIK MASTER ALAT -->
         <div class="p-2.5 bg-emerald-50/40 rounded-xl border border-emerald-200/80 space-y-1.5">
           <div class="flex items-center justify-between">
             <label class="text-[10px] font-bold text-emerald-900 uppercase flex items-center gap-1">
@@ -761,7 +755,6 @@
           </div>
         </div>
 
-        <!-- FOTO EDIT ALAT -->
         <div class="p-2.5 bg-emerald-50/40 rounded-xl border border-emerald-200/80 space-y-1.5">
           <div class="flex items-center justify-between">
             <label class="text-[10px] font-bold text-emerald-900 uppercase flex items-center gap-1">
@@ -1142,7 +1135,52 @@
       }
     }
 
-    // 4. DEVICE DETECTOR ENGINE
+    // 4. AUTO-KONEKSI NOMOR WHATSAPP PERANGKAT (DEVICE PHONE LINKER)
+    function autoConnectDevicePhone() {
+      const savedPhone = localStorage.getItem('app_device_whatsapp_number');
+      const phoneInput = document.getElementById('borrowerPhone');
+      const icon = document.getElementById('devicePhoneConnectedIcon');
+
+      if (savedPhone && phoneInput) {
+        if (!phoneInput.value) {
+          phoneInput.value = savedPhone;
+        }
+        if (icon) icon.classList.remove('hidden');
+      }
+
+      if (phoneInput) {
+        phoneInput.addEventListener('input', () => {
+          const val = phoneInput.value.trim();
+          if (val.length >= 9) {
+            localStorage.setItem('app_device_whatsapp_number', val);
+            if (icon) icon.classList.remove('hidden');
+          } else {
+            if (icon) icon.classList.add('hidden');
+          }
+        });
+      }
+    }
+
+    function loadSavedDevicePhone() {
+      const savedPhone = localStorage.getItem('app_device_whatsapp_number');
+      const phoneInput = document.getElementById('borrowerPhone');
+      const icon = document.getElementById('devicePhoneConnectedIcon');
+
+      if (savedPhone) {
+        phoneInput.value = savedPhone;
+        if (icon) icon.classList.remove('hidden');
+      } else {
+        const userPrompt = prompt("Masukkan nomor WhatsApp yang aktif di perangkat ini (contoh: 08123456789):");
+        if (userPrompt && userPrompt.trim().length >= 9) {
+          const cleaned = userPrompt.trim().replace(/\D/g, '');
+          localStorage.setItem('app_device_whatsapp_number', cleaned);
+          phoneInput.value = cleaned;
+          if (icon) icon.classList.remove('hidden');
+        }
+      }
+    }
+
+    // 5. DEVICE DETECTOR ENGINE
     function parseDeviceInfo() {
       const ua = navigator.userAgent || '';
       let os = "Windows PC";
@@ -1165,9 +1203,7 @@
       return { compactName };
     }
 
-    // ========================================================
-    // 5. FITUR SEARCH MODEL: PENCARIAN ALAT INVENTARIS
-    // ========================================================
+    // 6. FITUR SEARCH MODEL PENCARIAN ALAT INVENTARIS
     function openToolSearchModal() {
       document.getElementById('toolModalSearchInput').value = '';
       filterToolsInModal();
@@ -1188,8 +1224,6 @@
       const countBadge = document.getElementById('toolSearchCountBadge');
 
       container.innerHTML = '';
-
-      // Hanya tampilkan alat yang statusnya TERSEDIA
       const availableTools = tools.filter(t => t.status === 'TERSEDIA');
 
       const filtered = availableTools.filter(t => {
@@ -1240,7 +1274,6 @@
     function selectToolFromSearch(tool) {
       document.getElementById('borrowToolSelect').value = tool.id;
 
-      // Update tampilan box preview di form
       const brandLabel = tool.brand || tool.category || "Umum";
       document.getElementById('selectedToolNameText').textContent = tool.name;
       document.getElementById('selectedToolSubText').textContent = `Merk: ${brandLabel} • ID: ${tool.id} • Kondisi: ${tool.condition || 'Baik'}`;
@@ -1264,7 +1297,7 @@
       document.getElementById('selectedToolBox').classList.remove('bg-emerald-50/50', 'border-emerald-300');
     }
 
-    // 6. DATABASE SINKRONISASI
+    // 7. DATABASE SINKRONISASI
     async function refreshData() {
       if (!supabaseClient) {
         loadLocalData();
@@ -1319,7 +1352,7 @@
       }
     }
 
-    // 7. TRANSAKSI LOGIC (PINJAM & KEMBALI)
+    // 8. TRANSAKSI LOGIC (PINJAM & KEMBALI)
     async function handleBorrowSubmit(e) {
       e.preventDefault();
       const toolId = document.getElementById('borrowToolSelect').value;
@@ -1335,6 +1368,11 @@
       if (!officerBorrow) return alert("Wajib mengisi nama petugas yang meminjamkan!");
       if (!photoData) return alert("Wajib lampirkan foto fisik awal!");
       if (!signatureData) return alert("Wajib bubuhkan tanda tangan peminjam!");
+
+      // Simpan nomor perangkat secara permanen
+      if (borrowerPhone.length >= 9) {
+        localStorage.setItem('app_device_whatsapp_number', borrowerPhone);
+      }
 
       const selectedTool = tools.find(t => t.id === toolId);
       const loanId = "TRX-" + Date.now().toString().slice(-6);
@@ -1381,6 +1419,7 @@
         alert("Peminjaman berhasil dicatat!");
         document.getElementById('borrowForm').reset();
         resetSelectedTool();
+        autoConnectDevicePhone();
         removePhoto('borrow');
         clearSignature('borrow');
         switchTab('dashboard');
@@ -1493,7 +1532,7 @@
       }
     }
 
-    // 8. EDIT & HAPUS LOGIC
+    // 9. EDIT & HAPUS LOGIC
     function openEditLoanModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1686,7 +1725,7 @@
       }
     }
 
-    // 9. RENDER LOGIC
+    // 10. RENDER LOGIC
     function renderAll() {
       renderStats();
       renderLoans();
@@ -1892,7 +1931,7 @@
       });
     }
 
-    // 10. SHARE WHATSAPP: TEKS BERSIH (100% BEBAS LINK)
+    // 11. SHARE WHATSAPP (TEKS BERSIH TANPA LINK)
     async function shareWhatsAppWithPhoto(loan) {
       if (!loan) return;
 
@@ -1956,7 +1995,7 @@
       window.open(waUrl, '_blank');
     }
 
-    // 11. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
+    // 12. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
     function openDetailModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -2050,7 +2089,7 @@
       }
     }
 
-    // 12. EXPORT EXCEL & CSV CORPORATE
+    // 13. EXPORT EXCEL & CSV CORPORATE
     function exportCorporateExcel() {
       if (loans.length === 0) return alert("Belum ada data transaksi untuk diekspor.");
 
@@ -2168,7 +2207,7 @@
       URL.revokeObjectURL(url);
     }
 
-    // 13. TABS & UTILITIES
+    // 14. TABS & UTILITIES
     function switchTab(tabId) {
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -2192,6 +2231,7 @@
       });
 
       if (tabId === 'borrow') {
+        autoConnectDevicePhone();
         if (!borrowSigPad) {
           borrowSigPad = new SimpleSignaturePad('borrowSigCanvas');
           const now = new Date();
@@ -2272,6 +2312,7 @@
     // ON LOAD INIT
     window.addEventListener('DOMContentLoaded', () => {
       refreshData();
+      autoConnectDevicePhone();
     });
   </script>
 </body>
