@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>Sistem Sirkulasi & Inventaris Alat Kerja</title>
-  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, audit log device pengunjung, dan export Excel/CSV corporate." />
+  <meta name="description" content="Aplikasi mobile banking style untuk peminjaman dan pengembalian inventaris alat kerja berbasis Supabase database, kompresi foto inspeksi ≤100KB, deteksi device peminjam, berita acara digital PDF tajam A4, dan export Excel/CSV corporate." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#064e3b" />
 
@@ -35,7 +35,7 @@
       cursor: crosshair;
     }
     .mobile-safe-bottom {
-      padding-bottom: calc(7rem + env(safe-area-inset-bottom, 20px));
+      padding-bottom: calc(8.5rem + env(safe-area-inset-bottom, 24px));
     }
     ::-webkit-scrollbar {
       width: 4px;
@@ -54,9 +54,7 @@
 </head>
 <body class="min-h-full flex flex-col bg-slate-100 text-slate-800 antialiased">
 
-  <!-- ========================================================
-       TOP HEADER (Emerald Theme)
-  ======================================================== -->
+  <!-- TOP HEADER -->
   <header class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white sticky top-0 z-40 shadow-sm border-b border-emerald-700/40">
     <div class="max-w-5xl mx-auto px-3.5 py-2.5 sm:px-6 flex items-center justify-between">
       <div class="flex items-center space-x-2.5">
@@ -66,7 +64,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-extrabold text-xs tracking-tight text-white uppercase">ToolTrack M-Banking</span>
-            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.1</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-700 text-emerald-200 border border-emerald-600">v3.3</span>
           </div>
           <p class="text-[10px] text-emerald-200/90 font-medium">Sirkulasi & Inspeksi Alat Kerja</p>
         </div>
@@ -95,9 +93,7 @@
     </nav>
   </header>
 
-  <!-- ========================================================
-       MAIN APP WORKSPACE
-  ======================================================== -->
+  <!-- MAIN APP WORKSPACE -->
   <main class="max-w-5xl mx-auto px-3 sm:px-6 py-3 flex-1 w-full mobile-safe-bottom">
 
     <!-- TAB 1: BERANDA / DASHBOARD MUTASI -->
@@ -139,7 +135,7 @@
         <div class="flex-1 flex gap-2">
           <div class="relative flex-1">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-            <input type="text" id="searchInput" placeholder="Cari peminjam, petugas, alat..." oninput="renderLoans()" class="w-full pl-8 pr-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-medium focus:bg-white focus:outline-none focus:border-emerald-600 transition" />
+            <input type="text" id="searchInput" placeholder="Cari peminjam, alat, device..." oninput="renderLoans()" class="w-full pl-8 pr-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-medium focus:bg-white focus:outline-none focus:border-emerald-600 transition" />
           </div>
           <select id="filterStatus" onchange="renderLoans()" class="bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold px-2 py-1.5 text-slate-700 focus:bg-white focus:outline-none">
             <option value="ALL">Semua</option>
@@ -165,7 +161,7 @@
         <div class="flex items-center justify-between px-1">
           <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
             <i class="fa-solid fa-clock-rotate-left text-emerald-600 text-xs"></i>
-            Riwayat Mutasi Sirkulasi
+            Riwayat Mutasi Sirkulasi & Device
           </span>
           <span id="loanCountBadge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">0 Data</span>
         </div>
@@ -178,6 +174,7 @@
                 <th class="py-2.5 px-3">Alat & ID</th>
                 <th class="py-2.5 px-3">Peminjam</th>
                 <th class="py-2.5 px-3">Petugas Penyerah</th>
+                <th class="py-2.5 px-3">Device Digunakan</th>
                 <th class="py-2.5 px-3">Tgl Pinjam</th>
                 <th class="py-2.5 px-3 text-center">Foto Awal</th>
                 <th class="py-2.5 px-3">Tgl Kembali</th>
@@ -205,7 +202,7 @@
     </section>
 
     <!-- TAB 2: REGISTRASI PINJAM ALAT BARU -->
-    <section id="tab-borrow" class="hidden max-w-xl mx-auto space-y-3">
+    <section id="tab-borrow" class="hidden max-w-xl mx-auto space-y-3 pb-8">
       <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
         <div class="border-b border-slate-100 pb-2.5 flex items-center justify-between">
           <div>
@@ -240,12 +237,20 @@
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] font-bold text-emerald-900 uppercase tracking-wider mb-1">Petugas yang Meminjamkan <span class="text-red-500">*</span></label>
-              <input type="text" id="officerBorrow" required placeholder="Nama petugas gudang/teknisi" class="w-full px-2.5 py-1.5 bg-emerald-50/50 border border-emerald-300 rounded-xl text-xs font-bold text-emerald-900 focus:bg-white focus:outline-none focus:border-emerald-600" />
+              <input type="text" id="officerBorrow" required placeholder="Nama petugas gudang" class="w-full px-2.5 py-1.5 bg-emerald-50/50 border border-emerald-300 rounded-xl text-xs font-bold text-emerald-900 focus:bg-white focus:outline-none focus:border-emerald-600" />
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Waktu Pinjam <span class="text-red-500">*</span></label>
               <input type="datetime-local" id="borrowDate" required class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600" />
             </div>
+          </div>
+
+          <!-- DETEKSI DEVICE OTOMATIS (READONLY BADGE) -->
+          <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-600 flex items-center gap-1.5">
+              <i class="fa-solid fa-mobile-screen-button text-emerald-600"></i> Device Terdeteksi:
+            </span>
+            <span id="currentDetectedBorrowDevice" class="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-lg border border-emerald-300">Mendeteksi...</span>
           </div>
 
           <div>
@@ -307,16 +312,21 @@
             <p class="text-[9px] text-slate-400">Goreskan jari tangan di layar HP.</p>
           </div>
 
-          <button type="submit" id="submitBorrowBtn" class="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.99] text-white font-bold rounded-xl text-xs tracking-wide shadow-md shadow-emerald-900/20 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-check-circle"></i>
-            <span>Simpan Peminjaman</span>
-          </button>
+          <!-- TOMBOL SIMPAN -->
+          <div class="pt-2">
+            <button type="submit" id="submitBorrowBtn" class="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.99] text-white font-bold rounded-xl text-xs tracking-wide shadow-md shadow-emerald-900/20 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check-circle text-sm"></i>
+              <span>Simpan Peminjaman</span>
+            </button>
+          </div>
         </form>
       </div>
+
+      <div class="h-20 w-full pointer-events-none md:hidden" aria-hidden="true"></div>
     </section>
 
     <!-- TAB 3: KATALOG MASTER ALAT -->
-    <section id="tab-tools" class="hidden space-y-3">
+    <section id="tab-tools" class="hidden space-y-3 pb-8">
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
         <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
           <div>
@@ -333,11 +343,11 @@
         </div>
         <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
       </div>
+      <div class="h-20 w-full pointer-events-none md:hidden" aria-hidden="true"></div>
     </section>
 
-    <!-- TAB 4: AUDIT LOG PERANGKAT PENGUNJUNG (BARU) -->
-    <section id="tab-devicelogs" class="hidden space-y-3">
-      <!-- Device Metrics Widget -->
+    <!-- TAB 4: AUDIT LOG PERANGKAT PENGUNJUNG -->
+    <section id="tab-devicelogs" class="hidden space-y-3 pb-8">
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
           <div>
@@ -345,7 +355,7 @@
               <i class="fa-solid fa-shield-virus text-emerald-600"></i>
               Audit Log Perangkat Pengunjung
             </h2>
-            <p class="text-[10px] text-slate-500">Pencatatan jenis gawai, browser, dan alamat IP pengunjung sistem</p>
+            <p class="text-[10px] text-slate-500">Pencatatan gawai, sistem operasi, browser, dan alamat IP</p>
           </div>
           <button onclick="exportDeviceLogsExcel()" class="py-1 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-2xs">
             <i class="fa-solid fa-file-excel text-emerald-600"></i>
@@ -353,7 +363,6 @@
           </button>
         </div>
 
-        <!-- 3 Mini Stats Log -->
         <div class="grid grid-cols-3 gap-2 text-center">
           <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
             <span class="text-[9px] text-slate-400 font-bold uppercase block">Total Kunjungan</span>
@@ -370,7 +379,6 @@
         </div>
       </div>
 
-      <!-- Feed / Table Log Perangkat -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -380,7 +388,6 @@
           <span id="deviceLogBadge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">0 Log</span>
         </div>
 
-        <!-- Desktop View Table -->
         <div class="hidden lg:block overflow-x-auto">
           <table class="w-full text-left text-[11px] border-collapse">
             <thead class="bg-slate-50 text-slate-600 uppercase font-bold border-b border-slate-200">
@@ -397,10 +404,8 @@
           </table>
         </div>
 
-        <!-- Mobile View Cards -->
         <div id="deviceLogCardContainer" class="lg:hidden p-2.5 space-y-2"></div>
 
-        <!-- Empty Placeholder Log -->
         <div id="noDeviceLogPlaceholder" class="hidden py-8 text-center">
           <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-sm mb-1.5">
             <i class="fa-solid fa-laptop-code"></i>
@@ -408,14 +413,13 @@
           <p class="font-bold text-slate-600 text-xs">Belum ada riwayat akses perangkat</p>
         </div>
       </div>
+      <div class="h-20 w-full pointer-events-none md:hidden" aria-hidden="true"></div>
     </section>
 
   </main>
 
-  <!-- ========================================================
-       MOBILE FLOATING BOTTOM NAV DOCK
-  ======================================================== -->
-  <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-2 left-3 right-3 bg-white/90 backdrop-blur-lg border border-slate-200/90 rounded-2xl z-40 shadow-lg px-2 py-1.5">
+  <!-- MOBILE FLOATING BOTTOM NAV DOCK -->
+  <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-2 left-3 right-3 bg-white/95 backdrop-blur-lg border border-slate-200/90 rounded-2xl z-40 shadow-lg px-2 py-1.5">
     <div class="grid grid-cols-4 items-center text-center">
       <button onclick="switchTab('dashboard')" class="mobile-tab-btn flex flex-col items-center py-1 text-emerald-800 font-bold transition active:scale-95" data-tab="dashboard">
         <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
@@ -441,9 +445,7 @@
     </div>
   </nav>
 
-  <!-- ========================================================
-       MODAL 1: PROSES PENGEMBALIAN ALAT
-  ======================================================== -->
+  <!-- MODAL 1: PROSES PENGEMBALIAN ALAT -->
   <div id="returnModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
@@ -471,6 +473,14 @@
             <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Waktu Kembali *</label>
             <input type="datetime-local" id="returnDate" required class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-emerald-600" />
           </div>
+        </div>
+
+        <!-- DEVICE PENGEMBALIAN TERDETEKSI -->
+        <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+          <span class="text-[10px] font-bold text-slate-600 flex items-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen-button text-emerald-600"></i> Device Pengembalian:
+          </span>
+          <span id="currentDetectedReturnDevice" class="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-lg border border-emerald-300">Mendeteksi...</span>
         </div>
 
         <div>
@@ -546,9 +556,7 @@
     </div>
   </div>
 
-  <!-- ========================================================
-       MODAL 2: DOKUMEN RESMI & PDF RESOLUSI TINGGI (A4)
-  ======================================================== -->
+  <!-- MODAL 2: DOKUMEN RESMI & PDF RESOLUSI TINGGI (A4) -->
   <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -572,7 +580,7 @@
           </div>
         </div>
 
-        <!-- TABEL RINCIAN TRANSAKSI -->
+        <!-- TABEL RINCIAN TRANSAKSI (DILENGKAPI DEVICE) -->
         <div class="grid grid-cols-2 gap-2 text-[11px]">
           <div class="p-2 rounded bg-slate-50 border border-slate-200">
             <span class="text-[9px] text-slate-400 uppercase font-bold block">Nama Alat Kerja</span>
@@ -595,8 +603,16 @@
             <span id="docBorrowDate" class="font-semibold text-slate-800"></span>
           </div>
           <div class="p-2 rounded bg-slate-50 border border-slate-200">
+            <span class="text-[9px] text-slate-400 uppercase font-bold block">Device Peminjaman</span>
+            <span id="docDeviceBorrow" class="font-semibold text-slate-800 font-mono text-[10px]">-</span>
+          </div>
+          <div class="p-2 rounded bg-slate-50 border border-slate-200">
             <span class="text-[9px] text-slate-400 uppercase font-bold block">Waktu Kembali</span>
             <span id="docReturnDate" class="font-semibold text-slate-800">-</span>
+          </div>
+          <div class="p-2 rounded bg-slate-50 border border-slate-200">
+            <span class="text-[9px] text-slate-400 uppercase font-bold block">Device Pengembalian</span>
+            <span id="docDeviceReturn" class="font-semibold text-slate-800 font-mono text-[10px]">-</span>
           </div>
           <div class="p-2 rounded bg-slate-50 border border-slate-200">
             <span class="text-[9px] text-slate-400 uppercase font-bold block">Kondisi Pengembalian</span>
@@ -779,6 +795,17 @@
 
         <div class="grid grid-cols-2 gap-2">
           <div>
+            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Device Peminjam</label>
+            <input type="text" id="editLoanDeviceBorrow" class="w-full px-2.5 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-[10px] font-mono text-slate-600" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Device Pengembali</label>
+            <input type="text" id="editLoanDeviceReturn" class="w-full px-2.5 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-[10px] font-mono text-slate-600" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
             <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Waktu Pinjam *</label>
             <input type="datetime-local" id="editLoanBorrowDate" required class="w-full px-2.5 py-1.5 bg-slate-50 border rounded-xl" />
           </div>
@@ -814,9 +841,7 @@
     </div>
   </div>
 
-  <!-- ========================================================
-       CORE JAVASCRIPT
-  ======================================================== -->
+  <!-- CORE JAVASCRIPT -->
   <script>
     // 1. SUPABASE CONNECTION
     const SUPABASE_URL = "https://tztxcqaskdfsgcllfixd.supabase.co";
@@ -1041,7 +1066,6 @@
       return new Blob([u8arr], { type: mime });
     }
 
-    // 4. STORAGE SUPABASE UPLOADER
     async function uploadToSupabaseStorage(base64Data, filename) {
       if (!supabaseClient || !base64Data || !base64Data.startsWith('data:image')) {
         return base64Data;
@@ -1070,44 +1094,48 @@
       }
     }
 
-    // ========================================================
-    // 5. AUTO LOG DEVICE PENGUNJUNG (DEVICE DETECTOR ENGINE)
-    // ========================================================
+    // 4. DEVICE DETECTOR ENGINE (UNTUK DEVICE LOG & DEVICE PEMINJAM)
     function parseDeviceInfo() {
       const ua = navigator.userAgent || '';
       let deviceType = "Desktop / Laptop";
       let os = "Unknown OS";
       let browser = "Unknown Browser";
 
-      // Device Type
       if (/tablet|ipad|playbook|silk/i.test(ua)) {
         deviceType = "Tablet";
       } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/i.test(ua)) {
         deviceType = "Mobile Smartphone";
       }
 
-      // OS
       if (/Windows/i.test(ua)) os = "Windows";
       else if (/Android/i.test(ua)) os = "Android";
-      else if (/iPhone|iPad|iPod/i.test(ua)) os = "Apple iOS";
+      else if (/iPhone/i.test(ua)) os = "iPhone iOS";
+      else if (/iPad/i.test(ua)) os = "iPadOS";
       else if (/Macintosh|Mac OS X/i.test(ua)) os = "macOS";
       else if (/Linux/i.test(ua)) os = "Linux";
 
-      // Browser
-      if (/Chrome/i.test(ua) && !/Edge|Edg|OPR/i.test(ua)) browser = "Google Chrome";
-      else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = "Apple Safari";
-      else if (/Edg/i.test(ua)) browser = "Microsoft Edge";
-      else if (/Firefox/i.test(ua)) browser = "Mozilla Firefox";
+      if (/Chrome/i.test(ua) && !/Edge|Edg|OPR/i.test(ua)) browser = "Chrome";
+      else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = "Safari";
+      else if (/Edg/i.test(ua)) browser = "Edge";
+      else if (/Firefox/i.test(ua)) browser = "Firefox";
       else if (/OPR|Opera/i.test(ua)) browser = "Opera";
-      else if (/SamsungBrowser/i.test(ua)) browser = "Samsung Internet";
+      else if (/SamsungBrowser/i.test(ua)) browser = "Samsung Browser";
 
-      const screenRes = `${window.screen.width}x${window.screen.height} (${window.innerWidth}x${window.innerHeight} viewport)`;
+      const compactName = `${os} (${browser})`;
+      const screenRes = `${window.screen.width}x${window.screen.height}`;
 
-      return { deviceType, os, browser, screenRes, userAgent: ua };
+      return { deviceType, os, browser, compactName, screenRes, userAgent: ua };
+    }
+
+    function updateDetectedLabels() {
+      const info = parseDeviceInfo();
+      const borrowLbl = document.getElementById('currentDetectedBorrowDevice');
+      const returnLbl = document.getElementById('currentDetectedReturnDevice');
+      if (borrowLbl) borrowLbl.textContent = info.compactName;
+      if (returnLbl) returnLbl.textContent = info.compactName;
     }
 
     async function recordVisitorDeviceLog() {
-      // Cegah multi-insert jika halaman hanya di-refresh dalam sesi yang sama (30 menit)
       const lastLogged = sessionStorage.getItem('device_logged_time');
       const nowTs = Date.now();
       if (lastLogged && (nowTs - parseInt(lastLogged)) < 30 * 60 * 1000) {
@@ -1118,11 +1146,7 @@
       const logId = "DEV-" + Date.now().toString().slice(-6);
 
       let ip = "Checking...";
-      let city = "-";
-      let isp = "-";
-
       try {
-        // Ambil IP Publik secara aman
         const res = await fetch("https://api.ipify.org?format=json", { cache: "no-store" });
         if (res.ok) {
           const json = await res.json();
@@ -1139,8 +1163,8 @@
         browser: info.browser,
         screen_resolution: info.screenRes,
         ip_address: ip,
-        city: city,
-        isp: isp,
+        city: "-",
+        isp: "-",
         user_agent: info.userAgent,
         visited_at: new Date().toISOString()
       };
@@ -1185,7 +1209,6 @@
       placeholder.classList.add('hidden');
 
       visitorLogs.forEach(v => {
-        // Desktop Row
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
         tr.innerHTML = `
@@ -1205,7 +1228,6 @@
         `;
         tbody.appendChild(tr);
 
-        // Mobile Card
         const card = document.createElement('div');
         card.className = "bg-white p-2.5 rounded-xl border border-slate-200/90 shadow-2xs space-y-1.5";
         card.innerHTML = `
@@ -1255,7 +1277,7 @@
       XLSX.writeFile(wb, `Audit_Device_Logs_${Date.now()}.xlsx`);
     }
 
-    // 6. DATABASE SINKRONISASI
+    // 5. DATABASE SINKRONISASI
     async function refreshData() {
       if (!supabaseClient) {
         loadLocalData();
@@ -1281,7 +1303,6 @@
           loans = remoteLoans;
         }
 
-        // Ambil Log Perangkat dari Supabase
         const { data: remoteLogs, error: logErr } = await supabaseClient
           .from('visitor_logs')
           .select('*')
@@ -1322,7 +1343,7 @@
       }
     }
 
-    // 7. TRANSAKSI LOGIC (PINJAM & KEMBALI)
+    // 6. TRANSAKSI LOGIC (DENGAN REKAMAN DEVICE DIGUNAKAN)
     async function handleBorrowSubmit(e) {
       e.preventDefault();
       const toolId = document.getElementById('borrowToolSelect').value;
@@ -1341,6 +1362,7 @@
 
       const selectedTool = tools.find(t => t.id === toolId);
       const loanId = "TRX-" + Date.now().toString().slice(-6);
+      const deviceInfo = parseDeviceInfo().compactName;
 
       const btn = document.getElementById('submitBorrowBtn');
       btn.disabled = true;
@@ -1360,12 +1382,14 @@
           notes_borrow: notes,
           photo_before: photoUrl,
           signature_borrow: signatureData,
+          device_borrow: deviceInfo,
           return_date: null,
           condition_return: null,
           notes_return: null,
           photo_after: null,
           signature_return: null,
           officer_return: null,
+          device_return: null,
           status: "DIPINJAM"
         };
 
@@ -1392,7 +1416,7 @@
         alert("Gagal menyimpan: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-check-circle"></i> <span>Simpan Peminjaman</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-check-circle text-sm"></i> <span>Simpan Peminjaman</span>`;
       }
     }
 
@@ -1408,6 +1432,7 @@
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById('returnDate').value = now.toISOString().slice(0, 16);
 
+      updateDetectedLabels();
       removePhoto('return');
       clearSignature('return');
 
@@ -1435,6 +1460,7 @@
       if (!photoData) return alert("Wajib lampirkan foto fisik saat pengembalian!");
       if (!signatureData) return alert("Wajib tanda tangan penerima!");
 
+      const deviceInfo = parseDeviceInfo().compactName;
       const btn = document.getElementById('submitReturnBtn');
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah Foto & Menyimpan...`;
@@ -1449,6 +1475,7 @@
           notes_return: returnNotes,
           photo_after: photoUrl,
           signature_return: signatureData,
+          device_return: deviceInfo,
           status: "KEMBALI"
         };
 
@@ -1490,7 +1517,7 @@
       }
     }
 
-    // 8. EDIT & HAPUS LOGIC
+    // 7. EDIT & HAPUS LOGIC
     function openEditLoanModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1501,6 +1528,8 @@
       document.getElementById('editLoanBorrowerPhone').value = loan.borrower_phone || '';
       document.getElementById('editLoanOfficerBorrow').value = loan.officer_borrow || '';
       document.getElementById('editLoanOfficerReturn').value = loan.officer_return || '';
+      document.getElementById('editLoanDeviceBorrow').value = loan.device_borrow || '';
+      document.getElementById('editLoanDeviceReturn').value = loan.device_return || '';
       document.getElementById('editLoanBorrowDate').value = loan.borrow_date || '';
       document.getElementById('editLoanStatus').value = loan.status || 'DIPINJAM';
       document.getElementById('editLoanNotesBorrow').value = loan.notes_borrow || '';
@@ -1525,6 +1554,8 @@
         borrower_phone: document.getElementById('editLoanBorrowerPhone').value.trim(),
         officer_borrow: document.getElementById('editLoanOfficerBorrow').value.trim(),
         officer_return: document.getElementById('editLoanOfficerReturn').value.trim() || null,
+        device_borrow: document.getElementById('editLoanDeviceBorrow').value.trim() || null,
+        device_return: document.getElementById('editLoanDeviceReturn').value.trim() || null,
         borrow_date: document.getElementById('editLoanBorrowDate').value,
         status: document.getElementById('editLoanStatus').value,
         notes_borrow: document.getElementById('editLoanNotesBorrow').value.trim(),
@@ -1651,12 +1682,13 @@
       }
     }
 
-    // 9. RENDER LOGIC
+    // 8. RENDER LOGIC
     function renderAll() {
       renderStats();
       renderLoans();
       renderToolsSelect();
       renderToolsGrid();
+      updateDetectedLabels();
     }
 
     function renderStats() {
@@ -1674,6 +1706,7 @@
         const matchSearch = (l.tool_name || '').toLowerCase().includes(search) ||
                             (l.borrower_name || '').toLowerCase().includes(search) ||
                             (l.officer_borrow || '').toLowerCase().includes(search) ||
+                            (l.device_borrow || '').toLowerCase().includes(search) ||
                             (l.borrower_phone || '').includes(search) ||
                             (l.id || '').toLowerCase().includes(search);
         const matchStatus = statusFilter === 'ALL' || l.status === statusFilter;
@@ -1696,7 +1729,6 @@
       placeholder.classList.add('hidden');
 
       filtered.forEach(loan => {
-        // Desktop Row
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
         tr.innerHTML = `
@@ -1710,6 +1742,11 @@
           </td>
           <td class="py-2.5 px-3">
             <span class="font-bold text-emerald-800 text-xs">${loan.officer_borrow || '-'}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="text-[10px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded font-mono block truncate max-w-[130px]" title="${loan.device_borrow || '-'}">
+              <i class="fa-solid fa-mobile-screen-button text-[9px] text-emerald-700 mr-1"></i>${loan.device_borrow || '-'}
+            </span>
           </td>
           <td class="py-2.5 px-3 text-[10px] text-slate-600">${formatDateTime(loan.borrow_date)}</td>
           <td class="py-2.5 px-3 text-center">
@@ -1745,7 +1782,6 @@
         `;
         tbody.appendChild(tr);
 
-        // Mobile Card View
         const card = document.createElement('div');
         card.className = "bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2";
         card.innerHTML = `
@@ -1757,7 +1793,10 @@
               <div>
                 <h3 class="font-bold text-slate-900 text-xs leading-snug">${loan.tool_name}</h3>
                 <p class="text-[10px] text-slate-500 font-medium">${loan.borrower_name} • <span class="font-mono">${loan.borrower_phone}</span></p>
-                <p class="text-[9px] text-emerald-800 font-semibold"><i class="fa-solid fa-id-badge text-[8px] mr-0.5"></i> Penyerah: ${loan.officer_borrow || '-'}</p>
+                <div class="flex items-center gap-2 mt-0.5 text-[9px]">
+                  <span class="text-emerald-800 font-semibold"><i class="fa-solid fa-id-badge text-[8px] mr-0.5"></i> ${loan.officer_borrow || '-'}</span>
+                  <span class="text-slate-400 font-mono"><i class="fa-solid fa-mobile-screen text-[8px] mr-0.5 text-slate-400"></i> ${loan.device_borrow || '-'}</span>
+                </div>
               </div>
             </div>
             ${loan.status === 'DIPINJAM' ? 
@@ -1849,7 +1888,7 @@
       });
     }
 
-    // 10. SHARE WHATSAPP: TEKS BERSIH (100% BEBAS LINK)
+    // 9. SHARE WHATSAPP: TEKS BERSIH (100% BEBAS LINK)
     async function shareWhatsAppWithPhoto(loan) {
       if (!loan) return;
 
@@ -1859,11 +1898,13 @@
       message += `*Nama Alat:* ${loan.tool_name}\n`;
       message += `*Nama Peminjam:* ${loan.borrower_name}\n`;
       message += `*Petugas Penyerah:* ${loan.officer_borrow || '-'}\n`;
+      message += `*Device Pinjam:* ${loan.device_borrow || '-'}\n`;
       message += `*Waktu Pinjam:* ${formatDateTime(loan.borrow_date)}\n`;
       message += `*Status:* ${loan.status}\n`;
       if (loan.return_date) {
         message += `*Waktu Kembali:* ${formatDateTime(loan.return_date)}\n`;
         message += `*Petugas Penerima:* ${loan.officer_return || '-'}\n`;
+        message += `*Device Kembali:* ${loan.device_return || '-'}\n`;
         message += `*Kondisi Akhir:* ${loan.condition_return || '-'}\n`;
       }
       if (loan.notes_borrow) {
@@ -1911,7 +1952,7 @@
       window.open(waUrl, '_blank');
     }
 
-    // 11. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
+    // 10. DETAIL & EXPORT PDF TAJAM BERESOLUSI TINGGI (A4 HD)
     function openDetailModal(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) return;
@@ -1921,6 +1962,7 @@
       document.getElementById('docToolName').textContent = loan.tool_name;
       document.getElementById('docBorrowerName').textContent = loan.borrower_name;
       document.getElementById('docOfficerBorrow').textContent = loan.officer_borrow || '-';
+      document.getElementById('docDeviceBorrow').textContent = loan.device_borrow || '-';
       document.getElementById('docBorrowerPhone').textContent = loan.borrower_phone;
       document.getElementById('docBorrowDate').textContent = formatDateTime(loan.borrow_date);
       document.getElementById('docBorrowerSignName').textContent = loan.borrower_name;
@@ -1941,6 +1983,7 @@
         document.getElementById('docReturnDate').textContent = formatDateTime(loan.return_date);
         document.getElementById('docConditionReturn').textContent = loan.condition_return || '-';
         document.getElementById('docOfficerReturn').textContent = loan.officer_return || '-';
+        document.getElementById('docDeviceReturn').textContent = loan.device_return || '-';
         document.getElementById('docOfficerSignName').textContent = loan.officer_return || 'Petugas Unit';
         
         document.getElementById('docPhotoAfter').src = loan.photo_after;
@@ -1954,6 +1997,7 @@
         document.getElementById('docReturnDate').textContent = "Belum Dikembalikan";
         document.getElementById('docConditionReturn').textContent = "-";
         document.getElementById('docOfficerReturn').textContent = "-";
+        document.getElementById('docDeviceReturn').textContent = "-";
         document.getElementById('docOfficerSignName').textContent = loan.officer_borrow || 'Petugas Unit';
         
         document.getElementById('docPhotoAfter').classList.add('hidden');
@@ -2002,7 +2046,7 @@
       }
     }
 
-    // 12. EXPORT EXCEL & CSV CORPORATE
+    // 11. EXPORT EXCEL & CSV CORPORATE (DILENGKAPI DATA DEVICE)
     function exportCorporateExcel() {
       if (loans.length === 0) return alert("Belum ada data transaksi untuk diekspor.");
 
@@ -2022,9 +2066,11 @@
           "PEMINJAM",
           "NO. WHATSAPP",
           "PETUGAS PENYERAH",
+          "DEVICE PINJAM",
           "WAKTU PINJAM",
           "STATUS MUTASI",
           "PETUGAS PENERIMA",
+          "DEVICE KEMBALI",
           "WAKTU PENGEMBALIAN",
           "KONDISI PENGEMBALIAN",
           "CATATAN / KEPERLUAN"
@@ -2039,9 +2085,11 @@
           l.borrower_name,
           l.borrower_phone ? `'${l.borrower_phone}` : "-",
           l.officer_borrow || "-",
+          l.device_borrow || "-",
           formatDateTime(l.borrow_date),
           l.status,
           l.officer_return || "-",
+          l.device_return || "-",
           l.return_date ? formatDateTime(l.return_date) : "-",
           l.condition_return || "-",
           l.notes_borrow || "-"
@@ -2053,8 +2101,8 @@
 
       ws['!cols'] = [
         { wch: 5 },  { wch: 15 }, { wch: 30 }, { wch: 22 }, { wch: 18 },
-        { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 20 },
-        { wch: 22 }, { wch: 30 }
+        { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 20 },
+        { wch: 20 }, { wch: 20 }, { wch: 22 }, { wch: 30 }
       ];
 
       XLSX.utils.book_append_sheet(wb, ws, "Mutasi Alat");
@@ -2073,7 +2121,7 @@
       csvContent += `"Tanggal Ekstraksi: ${printDate}"\n`;
       csvContent += `"Total: ${loans.length} | Dipinjam: ${loans.filter(l=>l.status==='DIPINJAM').length} | Selesai: ${loans.filter(l=>l.status==='KEMBALI').length}"\n\n`;
 
-      csvContent += `"NO","ID TRANSAKSI","NAMA ALAT KERJA","NAMA PEMINJAM","NO WHATSAPP","PETUGAS PENYERAH","WAKTU PINJAM","STATUS","PETUGAS PENERIMA","WAKTU KEMBALI","KONDISI KEMBALI","CATATAN"\n`;
+      csvContent += `"NO","ID TRANSAKSI","NAMA ALAT KERJA","NAMA PEMINJAM","NO WHATSAPP","PETUGAS PENYERAH","DEVICE PINJAM","WAKTU PINJAM","STATUS","PETUGAS PENERIMA","DEVICE KEMBALI","WAKTU KEMBALI","KONDISI KEMBALI","CATATAN"\n`;
 
       loans.forEach((l, idx) => {
         const clean = (val) => String(val || '-').replace(/"/g, '""');
@@ -2085,9 +2133,11 @@
           `"${clean(l.borrower_name)}"`,
           phone,
           `"${clean(l.officer_borrow)}"`,
+          `"${clean(l.device_borrow)}"`,
           `"${clean(formatDateTime(l.borrow_date))}"`,
           `"${clean(l.status)}"`,
           `"${clean(l.officer_return)}"`,
+          `"${clean(l.device_return)}"`,
           `"${clean(l.return_date ? formatDateTime(l.return_date) : '-')}"`,
           `"${clean(l.condition_return)}"`,
           `"${clean(l.notes_borrow)}"`
@@ -2106,7 +2156,7 @@
       URL.revokeObjectURL(url);
     }
 
-    // 13. TABS & UTILITIES
+    // 12. TABS & UTILITIES
     function switchTab(tabId) {
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -2129,11 +2179,14 @@
         }
       });
 
-      if (tabId === 'borrow' && !borrowSigPad) {
-        borrowSigPad = new SimpleSignaturePad('borrowSigCanvas');
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        document.getElementById('borrowDate').value = now.toISOString().slice(0, 16);
+      if (tabId === 'borrow') {
+        updateDetectedLabels();
+        if (!borrowSigPad) {
+          borrowSigPad = new SimpleSignaturePad('borrowSigCanvas');
+          const now = new Date();
+          now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+          document.getElementById('borrowDate').value = now.toISOString().slice(0, 16);
+        }
       }
     }
 
@@ -2183,6 +2236,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       refreshData();
       recordVisitorDeviceLog();
+      updateDetectedLabels();
     });
   </script>
 </body>
