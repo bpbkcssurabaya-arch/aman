@@ -5,26 +5,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>Sistem Manajemen & Peminjaman Alat Kerja | Enterprise Tool Management System</title>
-  <meta name="description" content="Aplikasi enterprise manajemen peminjaman dan pengembalian inventaris alat kerja berbasis cloud database, kompresi foto inspeksi &le;100KB, berita acara digital PDF, dan integrasi WhatsApp." />
-  <meta name="keywords" content="sistem peminjaman alat, inventory tools management, berita acara digital, kompresi foto, audit alat kerja, bsn surabaya" />
+  <meta name="description" content="Aplikasi enterprise manajemen peminjaman dan pengembalian inventaris alat kerja berbasis cloud database, kompresi foto inspeksi ≤100KB, berita acara digital PDF, dan integrasi WhatsApp." />
+  <meta name="keywords" content="sistem peminjaman alat, inventory tools management, berita acara digital, kompresi foto, audit alat kerja" />
   <meta name="author" content="Enterprise Asset Management" />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0f172a" />
   <meta name="application-name" content="ToolTrack Enterprise" />
 
-  <!-- Open Graph / Facebook / WhatsApp Preview -->
+  <!-- Open Graph / WhatsApp Preview -->
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="id_ID" />
   <meta property="og:title" content="Sistem Manajemen & Peminjaman Alat Kerja Enterprise" />
   <meta property="og:description" content="Pencatatan sirkulasi alat kerja, inspeksi foto sebelum & sesudah pinjam, tanda tangan digital, serta cetak berita acara PDF otomatis." />
-  <meta property="og:site_name" content="ToolTrack Enterprise System" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Sistem Manajemen & Peminjaman Alat Kerja Enterprise" />
-  <meta name="twitter:description" content="Pencatatan sirkulasi inventaris, dokumentasi foto fisik <100KB, dan berita acara digital." />
-
-  <!-- Schema.org JSON-LD Structured Data for Search Engines -->
+  <!-- Schema.org JSON-LD Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -32,7 +26,7 @@
     "name": "Sistem Peminjaman & Pengembalian Alat Kerja Enterprise",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "All",
-    "description": "Sistem informasi sirkulasi peminjaman alat teknisi dan inventaris operasional dengan kompresi foto otomatis dan pelaporan berita acara digital.",
+    "description": "Sistem sirkulasi peminjaman alat teknisi dan inventaris dengan kompresi foto otomatis dan berita acara digital.",
     "offers": {
       "@type": "Offer",
       "price": "0",
@@ -47,7 +41,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <!-- Font Awesome Pro Icons CDN -->
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -64,14 +58,13 @@
       touch-action: none;
       cursor: crosshair;
     }
-    /* Safe Area insets for modern borderless iPhones / Androids */
-    .pb-safe {
-      padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+    /* Padding ekstra di bagian bawah agar konten tidak tertutup fixed bottom nav */
+    .pb-bottom-nav {
+      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 16px));
     }
-    .pt-safe {
-      padding-top: env(safe-area-inset-top, 0px);
+    .bottom-nav-safe {
+      padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
     }
-    /* Custom Scrollbar for Enterprise Feel */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -91,7 +84,7 @@
 <body class="min-h-full flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-slate-900 selection:text-white">
 
   <!-- ========================================================
-       TOP ENTERPRISE NAV / HEADER (Corporate Navy & Slate)
+       TOP HEADER (Bersih Tanpa Status Cloud & Tanpa Tombol DB)
   ======================================================== -->
   <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -111,19 +104,12 @@
           </div>
         </div>
 
-        <!-- Right Side: Cloud DB Status & Settings Button -->
-        <div class="flex items-center space-x-3">
-          <div id="supabaseStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/70 text-emerald-400 border border-emerald-800">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="hidden sm:inline">Supabase Cloud Active</span>
-            <span class="sm:hidden">Cloud</span>
-          </div>
+        <!-- Tombol Sinkronisasi Cepat -->
+        <button onclick="refreshData()" title="Sinkronkan Data" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/80 transition text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-arrows-rotate text-blue-400"></i>
+          <span>Sinkron</span>
+        </button>
 
-          <button onclick="openConfigModal()" aria-label="Pengaturan Database" class="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/80 transition text-sm flex items-center gap-1.5">
-            <i class="fa-solid fa-database text-xs text-blue-400"></i>
-            <span class="hidden md:inline text-xs font-semibold">Koneksi DB</span>
-          </button>
-        </div>
       </div>
     </div>
 
@@ -144,14 +130,14 @@
   <!-- ========================================================
        MAIN APP WORKSPACE
   ======================================================== -->
-  <main class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full pb-safe md:pb-12">
+  <main class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full pb-bottom-nav">
 
     <!-- ==========================================
          TAB 1: DASHBOARD & DAFTAR TRANSAKSI
     ========================================== -->
     <section id="tab-dashboard" class="space-y-4 sm:space-y-6">
       
-      <!-- Operational Metric Cards (Corporate KPI style) -->
+      <!-- Metric Cards -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         
         <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
@@ -186,7 +172,7 @@
 
         <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Log Sirkulasi</span>
+            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Sirkulasi</span>
             <span id="statTotalLoans" class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">0</span>
           </div>
           <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center text-base">
@@ -212,13 +198,9 @@
           </select>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- Export CSV Button -->
         <div class="flex items-center gap-2">
-          <button onclick="refreshData()" class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
-            <i class="fa-solid fa-arrows-rotate text-blue-600"></i>
-            <span>Sinkron Data</span>
-          </button>
-          <button onclick="exportAllCSV()" class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
+          <button onclick="exportAllCSV()" class="w-full sm:w-auto px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
             <i class="fa-solid fa-file-csv text-emerald-600"></i>
             <span>Export CSV</span>
           </button>
@@ -227,7 +209,7 @@
       </div>
 
       <!-- Main Audit Table / Mobile Cards Feed -->
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
         
         <div class="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div class="flex items-center gap-2">
@@ -258,8 +240,8 @@
           </table>
         </div>
 
-        <!-- MOBILE & TABLET CARD FEED (Optimized for Mobile Phones) -->
-        <div id="loanCardContainer" class="lg:hidden p-3 space-y-3 bg-slate-100/50">
+        <!-- MOBILE & TABLET CARD FEED (Dengan bottom margin aman) -->
+        <div id="loanCardContainer" class="lg:hidden p-3 space-y-3 bg-slate-100/50 pb-6">
           <!-- Populated via Javascript -->
         </div>
 
@@ -335,10 +317,9 @@
                 <i class="fa-solid fa-camera text-blue-600"></i>
                 Dokumentasi Fisik Sebelum Dipinjam <span class="text-red-500">*</span>
               </label>
-              <span id="borrowPhotoBadge" class="text-[10px] font-semibold text-slate-500">Auto &le; 100 KB</span>
+              <span id="borrowPhotoBadge" class="text-[10px] font-semibold text-slate-500">Auto ≤ 100 KB</span>
             </div>
 
-            <!-- Two Dedicated Buttons (Mobile Friendly) -->
             <div class="grid grid-cols-2 gap-2">
               <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-800 cursor-pointer font-bold text-xs shadow-2xs transition active:scale-95 text-center">
                 <i class="fa-solid fa-camera text-blue-600"></i>
@@ -353,12 +334,10 @@
               </label>
             </div>
 
-            <!-- Compression Loader -->
             <div id="borrowCompressProgress" class="hidden py-2 text-center text-xs font-medium text-blue-700 animate-pulse">
-              <i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengompresi resolusi foto ke target &le; 100 KB...
+              <i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengompresi resolusi foto ke target ≤ 100 KB...
             </div>
 
-            <!-- Image Preview Box -->
             <div id="borrowPhotoPreviewContainer" class="hidden relative rounded-lg overflow-hidden border border-slate-300 bg-slate-900 flex justify-center items-center max-h-52">
               <img id="borrowPhotoPreview" src="" alt="Preview Foto Sebelum" class="max-h-52 w-auto object-contain" />
               <button type="button" onclick="removePhoto('borrow')" aria-label="Hapus Foto" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs">
@@ -429,9 +408,9 @@
   </main>
 
   <!-- ========================================================
-       MOBILE ENTERPRISE BOTTOM NAVIGATION (Ergonomic Phone UI)
+       MOBILE ENTERPRISE BOTTOM NAVIGATION (Clean & Non-blocking)
   ======================================================== -->
-  <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 shadow-lg px-2 py-1.5">
+  <nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 shadow-lg px-3 pt-2 bottom-nav-safe">
     <div class="grid grid-cols-3 items-center">
       
       <button onclick="switchTab('dashboard')" class="mobile-tab-btn flex flex-col items-center py-1 text-slate-900 font-bold" data-tab="dashboard">
@@ -455,7 +434,7 @@
   </nav>
 
   <!-- ========================================================
-       MODAL 1: PROSES PENGEMBALIAN ALAT (Bottom-sheet on Mobile)
+       MODAL 1: PROSES PENGEMBALIAN ALAT
   ======================================================== -->
   <div id="returnModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-t-2xl sm:rounded-2xl max-w-xl w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
@@ -507,7 +486,7 @@
               <i class="fa-solid fa-camera text-emerald-600"></i>
               Foto Kondisi Saat Kembali <span class="text-red-500">*</span>
             </label>
-            <span id="returnPhotoBadge" class="text-[10px] font-semibold text-slate-500">Auto &le; 100 KB</span>
+            <span id="returnPhotoBadge" class="text-[10px] font-semibold text-slate-500">Auto ≤ 100 KB</span>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
@@ -525,7 +504,7 @@
           </div>
 
           <div id="returnCompressProgress" class="hidden py-1.5 text-center text-xs font-medium text-emerald-700 animate-pulse">
-            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengompresi foto ke &le; 100 KB...
+            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengompresi foto ke ≤ 100 KB...
           </div>
 
           <div id="returnPhotoPreviewContainer" class="hidden relative rounded-lg overflow-hidden border border-slate-300 bg-slate-900 flex justify-center items-center max-h-44">
@@ -620,7 +599,7 @@
           </div>
         </div>
 
-        <!-- Documentation Photos (Before vs After) -->
+        <!-- Documentation Photos -->
         <div>
           <h5 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Inspeksi Fisik Digital</h5>
           <div class="grid grid-cols-2 gap-2">
@@ -708,54 +687,23 @@
   </div>
 
   <!-- ========================================================
-       MODAL 4: PENGATURAN KONEKSI SUPABASE
-  ======================================================== -->
-  <div id="configModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-3.5">
-      <div class="flex items-center justify-between border-b pb-3">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-database text-blue-600 text-sm"></i>
-          <h3 class="font-bold text-slate-900 text-sm">Konfigurasi Cloud Supabase</h3>
-        </div>
-        <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="space-y-2.5 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Supabase Project URL</label>
-          <input type="text" id="cfgUrl" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono text-[11px]" />
-        </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Supabase Anon Key</label>
-          <input type="text" id="cfgKey" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-mono text-[11px]" />
-        </div>
-      </div>
-
-      <button onclick="saveSupabaseConfig()" class="w-full py-2.5 bg-slate-900 text-white font-bold rounded-lg text-xs">Simpan Konfigurasi</button>
-    </div>
-  </div>
-
-  <!-- ========================================================
        APPLICATION LOGIC SCRIPT
   ======================================================== -->
   <script>
-    // 1. SUPABASE CREDENTIALS & INITIALIZATION
-    const DEFAULT_SUPABASE_URL = "https://tztxcqaskdfsgcllfixd.supabase.co";
-    const DEFAULT_SUPABASE_KEY = "sb_publishable_pKV-0VdO0wSKzPM4JWeNhg_DC1xn2EA";
-
-    let supabaseUrl = localStorage.getItem("app_supabase_url") || DEFAULT_SUPABASE_URL;
-    let supabaseKey = localStorage.getItem("app_supabase_key") || DEFAULT_SUPABASE_KEY;
+    // 1. SUPABASE CONNECTION (Konfigurasi Otomatis di Background)
+    const SUPABASE_URL = "https://tztxcqaskdfsgcllfixd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_pKV-0VdO0wSKzPM4JWeNhg_DC1xn2EA";
 
     let supabaseClient = null;
     try {
-      if (supabaseUrl && supabaseKey) {
-        supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+      if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       }
     } catch (e) {
       console.warn("Inisialisasi Supabase:", e);
     }
 
-    // LOCAL DATA / CACHE
+    // DATA STATE
     let tools = [
       { id: "ALT-001", name: "Bor Tangan Cordless Bosch 18V", category: "Power Tools", condition: "Baik", status: "TERSEDIA" },
       { id: "ALT-002", name: "Multimeter Digital Sanwa CD800a", category: "Alat Ukur", condition: "Baik", status: "TERSEDIA" },
@@ -765,7 +713,7 @@
     let loans = [];
     let currentDetailLoan = null;
 
-    // 2. SIGNATURE PAD CLASS (Mobile Touch & Mouse)
+    // 2. SIGNATURE PAD CLASS
     class SimpleSignaturePad {
       constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
@@ -855,7 +803,7 @@
 
     let borrowSigPad, returnSigPad;
 
-    // 3. IMAGE COMPRESSION (TARGET <= 100 KB)
+    // 3. IMAGE COMPRESSION (≤ 100 KB)
     async function processImage(fileInput, type) {
       const file = fileInput.files[0];
       if (!file) return;
@@ -981,7 +929,7 @@
       }
     }
 
-    // 4. DATABASE SYNC & API CALLS
+    // 4. DATABASE SYNC
     async function refreshData() {
       if (!supabaseClient) {
         loadLocalData();
@@ -1010,7 +958,7 @@
         saveToLocalStorageCache();
         renderAll();
       } catch (err) {
-        console.warn("Supabase refresh fallback:", err);
+        console.warn("Supabase sync fallback:", err);
         loadLocalData();
       }
     }
@@ -1032,7 +980,7 @@
       }
     }
 
-    // 5. CRUD: PINJAM & PENGEMBALIAN
+    // 5. CRUD ALUR PEMINJAMAN & PENGEMBALIAN
     async function handleBorrowSubmit(e) {
       e.preventDefault();
       const toolId = document.getElementById('borrowToolSelect').value;
@@ -1287,7 +1235,7 @@
         `;
         tbody.appendChild(tr);
 
-        // Mobile Card (Professional Corporate Card View)
+        // Mobile Card View
         const card = document.createElement('div');
         card.className = "bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-2.5";
         card.innerHTML = `
@@ -1303,7 +1251,6 @@
             }
           </div>
 
-          <!-- Dual Photo Comparison for Mobile Phones -->
           <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
             <div>
               <span class="text-[10px] text-slate-500 font-bold block mb-1">Foto Sebelum:</span>
@@ -1524,7 +1471,7 @@
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
-      // Desktop Styling
+      // Desktop Tab Styling
       document.querySelectorAll('.tab-btn').forEach(btn => {
         if (btn.getAttribute('data-tab') === tabId) {
           btn.className = "tab-btn active-tab px-4 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 border-blue-500 text-blue-400 flex items-center gap-2 transition";
@@ -1570,7 +1517,6 @@
       w.document.write(`<title>Pratinjau Inspeksi Foto</title><body style="margin:0; background:#0f172a; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${url}" style="max-width:95%; max-height:95%; object-fit:contain; border-radius:8px;" /></body>`);
     }
 
-    // Master Tool Modal
     function openAddToolModal() { document.getElementById('addToolModal').classList.remove('hidden'); }
     function closeAddToolModal() { document.getElementById('addToolModal').classList.add('hidden'); }
     
@@ -1593,22 +1539,6 @@
       document.getElementById('newToolCategory').value = '';
       renderAll();
       alert("Alat baru berhasil ditambahkan!");
-    }
-
-    // Config Modal
-    function openConfigModal() {
-      document.getElementById('cfgUrl').value = supabaseUrl;
-      document.getElementById('cfgKey').value = supabaseKey;
-      document.getElementById('configModal').classList.remove('hidden');
-    }
-    function closeConfigModal() { document.getElementById('configModal').classList.add('hidden'); }
-
-    function saveSupabaseConfig() {
-      const url = document.getElementById('cfgUrl').value.trim();
-      const key = document.getElementById('cfgKey').value.trim();
-      localStorage.setItem('app_supabase_url', url);
-      localStorage.setItem('app_supabase_key', key);
-      location.reload();
     }
 
     // INITIALIZATION
